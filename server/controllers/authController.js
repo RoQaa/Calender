@@ -1,3 +1,5 @@
+const multer=require('multer')
+const sharp=require('sharp');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -7,6 +9,39 @@ const User = require(`${__dirname}/../models/userModel`)
 const sendEmail=require(`${__dirname}/../utils/email`)
 const { catchAsync } = require(`${__dirname}/../utils/catchAsync`);
 const AppError = require(`${__dirname}/../utils/appError`);
+
+
+const multerFilter = (req, file, cb) => {
+    
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
+  }
+};
+
+const multerStorage = multer.memoryStorage();
+
+
+
+const upload = multer({
+  storage: multerStorage,
+ // limits: { fileSize: 2000000 /* bytes */ },
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('profileImage');
+
+
+
+
+
+
+
+
+
+
+
 
 const signToken = (id) => {
   const token = jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -53,16 +88,30 @@ const createSendToken = (user, statusCode, message, res) => {
 
 exports.SignUp = catchAsync(async (req, res, next) => {
   req.body.role=undefined;
-  const newUser = await User.create(req.body);
+  const user = new User(req.body);
+  const id=user._id.toString();
 
 
-  if (!newUser) {
+  if (!user) {
     return next(new AppError(`SomeThing Error cannot sign up`, 404));
   }
 
+  if (req.file){
+    req.file.filename = `user-${id}-${Date.now()}.jpeg`;
+
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/users/${req.file.filename}`);
+      user.profileImage=`public/img/users/${req.file.filename}`;
+  } 
+  
+  await user.save();
 
 
-  createSendToken(newUser, 201, "sign up successfully", res);
+  createSendToken(user, 201, "sign up successfully", res);
+
   
 
 

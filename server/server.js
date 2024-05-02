@@ -14,7 +14,7 @@ const app = require(`${__dirname}/app`);
 const server = http.createServer(app);
 
 
-const DB = process.env.DATABASE
+const DB = process.env.DATABASE.replace('<password>',process.env.PASSWORD)
 mongoose.set("strictQuery", false);
 mongoose
   .connect(DB)
