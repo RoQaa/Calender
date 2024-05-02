@@ -1,18 +1,18 @@
-const multer=require('multer')
-const sharp=require('sharp');
+const multer = require('multer')
+const sharp = require('sharp');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+
 const crypto = require('crypto');
 const validator = require('validator');
 const User = require(`${__dirname}/../models/userModel`)
-const sendEmail=require(`${__dirname}/../utils/email`)
+const sendEmail = require(`${__dirname}/../utils/email`)
 const { catchAsync } = require(`${__dirname}/../utils/catchAsync`);
 const AppError = require(`${__dirname}/../utils/appError`);
 
 
 const multerFilter = (req, file, cb) => {
-    
+
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
   } else {
@@ -26,21 +26,11 @@ const multerStorage = multer.memoryStorage();
 
 const upload = multer({
   storage: multerStorage,
- // limits: { fileSize: 2000000 /* bytes */ },
+  // limits: { fileSize: 2000000 /* bytes */ },
   fileFilter: multerFilter
 });
 
 exports.uploadUserPhoto = upload.single('profileImage');
-
-
-
-
-
-
-
-
-
-
 
 
 const signToken = (id) => {
@@ -75,7 +65,7 @@ const createSendToken = (user, statusCode, message, res) => {
     data: {
       name: user.name,
       // email:user.email,
-      // photo: user.photo,
+      profileImage: user.profileImage,
       //isPaid: user.isPaid,
       role: user.role,
     },
@@ -87,16 +77,16 @@ const createSendToken = (user, statusCode, message, res) => {
 
 
 exports.SignUp = catchAsync(async (req, res, next) => {
-  req.body.role=undefined;
+  req.body.role = undefined;
   const user = new User(req.body);
-  const id=user._id.toString();
+  const id = user._id.toString();
 
 
   if (!user) {
     return next(new AppError(`SomeThing Error cannot sign up`, 404));
   }
 
-  if (req.file){
+  if (req.file) {
     req.file.filename = `user-${id}-${Date.now()}.jpeg`;
 
     await sharp(req.file.buffer)
@@ -104,15 +94,15 @@ exports.SignUp = catchAsync(async (req, res, next) => {
       .toFormat('jpeg')
       .jpeg({ quality: 90 })
       .toFile(`public/img/users/${req.file.filename}`);
-      user.profileImage=`public/img/users/${req.file.filename}`;
-  } 
-  
+    user.profileImage = `public/img/users/${req.file.filename}`;
+  }
+
   await user.save();
 
 
   createSendToken(user, 201, "sign up successfully", res);
 
-  
+
 
 
 });
@@ -144,14 +134,14 @@ exports.login = catchAsync(async (req, res, next) => {
       )) /** 34an hyrun fe el correct 7ta loo ml2hoo4*/
     )
   ) {
-  
+
 
     return next(new AppError('Incorrect email or password', 401));
   }
   //3) if everything ok send token back to the client
- 
+
   createSendToken(user, 200, 'log in successfully', res);
-  
+
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -252,42 +242,42 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
     return next(new AppError("Current password isn't correct", 400));
   }
-    if(!req.body.newPassword||!req.body.newPasswordConfirm){
-      return next(new AppError("Please Enter new Password and password Confirm", 401));
-    }
-    if(req.body.newPassword!==req.body.newPasswordConfirm){
-      return next(new AppError("Password and Password confirm aren't the same", 401));
-    }
-    if ((await user.correctPassword(req.body.newPassword, user.password))){
-      return next(new AppError("it's the same Password", 401));
-    }
+  if (!req.body.newPassword || !req.body.newPasswordConfirm) {
+    return next(new AppError("Please Enter new Password and password Confirm", 401));
+  }
+  if (req.body.newPassword !== req.body.newPasswordConfirm) {
+    return next(new AppError("Password and Password confirm aren't the same", 401));
+  }
+  if ((await user.correctPassword(req.body.newPassword, user.password))) {
+    return next(new AppError("it's the same Password", 401));
+  }
   // 3) If so, update password
   user.password = req.body.newPassword;
   user.passwordConfirm = req.body.newPasswordConfirm;
 
   await user.save({ validateBeforeSave: false });
   // 4) Log user in, send JWT
- 
-   // createSendToken(user,200,'password has changed successfully, please log in again',res);
-   res.status(200).json({
-    status:true,
-    message:"Password Updated "
-   })
-  }
+
+  // createSendToken(user,200,'password has changed successfully, please log in again',res);
+  res.status(200).json({
+    status: true,
+    message: "Password Updated "
+  })
+}
 );
 
 exports.logOut = catchAsync(async (req, res, next) => {
-  res.cookie('jwt','loggedout',{
-    expires:new Date(Date.now()+10*1000),
-    httpOnly:true
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
   });
 
-    res.status(200).json({
-      status: true,
-      message: 'You logged out',
-      token:""
-    });
+  res.status(200).json({
+    status: true,
+    message: 'You logged out',
+    token: ""
   });
+});
 
 
 
