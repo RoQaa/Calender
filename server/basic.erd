@@ -1,0 +1,39 @@
+erdiagram Model
+
+notation=default
+
+entity Company {
+   Company_ID key
+   Name
+   Email
+   phone
+   Password 
+}
+entity Employee {
+   id key
+   Name 
+   Position 
+   Department 
+   Email 
+   Phone 
+   Company_ID partial-key
+    
+}
+
+entity Task {
+   id key
+   title
+  // Date 
+   Description 
+   Deadline 
+   kind
+   Employee_ID partial-key
+   
+
+}
+relationship work {
+   Employee[N] -> Company[1]
+}
+relationship has {
+   Employee[1] -> Task[N]
+}

@@ -22,7 +22,7 @@ mongoose
     console.log('DB connection Successfully');
   });
 
-
+//TODO:Notification and test all routers in postman
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => {

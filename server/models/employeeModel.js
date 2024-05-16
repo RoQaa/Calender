@@ -3,12 +3,11 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const otpGenerator = require('otp-generator');
-const userSchema = new mongoose.Schema({
+const employeeSchema = new mongoose.Schema({
     name:{
         type:String,
-        required:[true,'Please Enter your User Name'] ,
-       // unique:[true,"there's a user with that name "],
-        //trim:true
+        required:[true,'Please Enter your Employee Name'] ,
+
     },
     email:{
         type:String,
@@ -17,17 +16,13 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Please provide a correct email'],
     },
-    role:{
-        type:String,
-        enum:['user','admin','manger','company'],
-        default:'user'
-    },
+
     password: {
         type: String,
         required: [true, 'Please Enter your Password'],
         trim: true,
         minlength: [8, ' Password At least has 8 charachters'],
-        select: false, // make it invisible when get all users
+        select: false, // make it invisible when get all Employees
       },
       passwordConfirm: {
         type: String,
@@ -40,9 +35,11 @@ const userSchema = new mongoose.Schema({
           message: 'Passwords are not the same',
         },
       },
+
+    //TODO: default path for image
       profileImage:{
         type:String,
-        //default:"https://img.freepik.com/free-vector/mysterious-gangster-character-illustration_23-2148460670.jpg?w=826&t=st=1710593066~exp=1710593666~hmac=135e860a9c843230a617ae9f3b8838ad2424f468bef2ee4a354bffd879ec5063"
+
       },
       isActive:{
         type:Boolean,
@@ -53,13 +50,19 @@ const userSchema = new mongoose.Schema({
         required:[true,"Number Phone required"],
         unique:[true,"this number phone used before"]
       },
+        company:{
+        type:mongoose.Schema.ObjectId,
+            ref:"Company",
+            required:[true,"Please Enter your Company"],
+        },
       passwordChangedAt: Date,
       passwordOtp: String,
       passwordOtpExpires: Date,
 }, )
-  userSchema.index({ name: 'text', email: 'text' });
+
+  employeeSchema.index({ name: 'text', email: 'text' });
   // DOCUMENT MIDDLEWARE
-  userSchema.pre('save', async function (next) {
+  employeeSchema.pre('save', async function (next) {
     //only run if password modified
     if (!this.isModified('password')) {
       return next();
@@ -70,7 +73,7 @@ const userSchema = new mongoose.Schema({
   
     next();
   });
-  userSchema.pre('save', function(next) {
+  employeeSchema.pre('save', function(next) {
     if (!this.isModified('password') || this.isNew) return next();
   
     this.passwordChangedAt = Date.now() - 1000;
@@ -78,24 +81,24 @@ const userSchema = new mongoose.Schema({
   });
   
 
-/*
-  userSchema.pre(/^find/, function (next) {
-    this.find({ isActive: { $ne: false } }).select('-createdAt -rating');
+
+  employeeSchema.pre(/^find/, function (next) {
+    this.find({ isActive: { $ne: false } }).select('-__v')
     next();
   });
- */ 
+
 
 
   //instance method check password login
-userSchema.methods.correctPassword = async function (
+employeeSchema.methods.correctPassword = async function (
     candidatePassword,
-    userPassword
+    EmployeePassword
   ) {
-    return await bcrypt.compare(candidatePassword, userPassword); // compare bt3mal hash le candidate we btcompare b3deha
+    return await bcrypt.compare(candidatePassword, EmployeePassword); // compare bt3mal hash le candidate we btcompare b3deha
   };
 
   
-userSchema.methods.changesPasswordAfter = function (JWTTimestamps) {
+employeeSchema.methods.changesPasswordAfter = function (JWTTimestamps) {
     if (this.passwordChangedAt) {
       const changedTimestamps = parseInt(
         this.passwordChangedAt.getTime() / 1000,
@@ -109,7 +112,7 @@ userSchema.methods.changesPasswordAfter = function (JWTTimestamps) {
 
 
 
-  userSchema.methods.generateOtp = async function () {
+  employeeSchema.methods.generateOtp = async function () {
     const OTP = otpGenerator.generate(process.env.OTP_LENGTH, {
       upperCaseAlphabets: true,
       specialChars: false,
@@ -119,5 +122,5 @@ userSchema.methods.changesPasswordAfter = function (JWTTimestamps) {
     return OTP;
   };
 
-  const User = mongoose.model('User',userSchema);
-  module.exports=User;
+  const Employee = mongoose.model('Employee',employeeSchema);
+  module.exports=Employee;

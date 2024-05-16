@@ -9,7 +9,10 @@ const mongoSanitize = require('express-mongo-sanitize'); // security
 const xss = require('xss-clean'); // security
 const cors =require('cors')
 const AppError = require(`${__dirname}/utils/appError`);
-const userRouter=require('./routes/userRouter');
+const employeeRouter=require('./routes/employeeRouter');
+const companyRouter=require('./routes/companyRouter');
+const taskRouter=require('./routes/taskRouter');
+const kindTaskRouter=require('./routes/kindTaskRouter')
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
 const app = express();
 
@@ -22,6 +25,7 @@ app.use(helmet()); // set el htttp headers property
 
 
 app.use(cors());
+
 app.options('*',cors())
 // Poclicy for blocking images
 app.use((req, res, next) => {
@@ -60,13 +64,13 @@ app.use(xss());
 
 
 //serving static files
-//app.use(express.static(`${__dirname}/public`));
-//app.use('/static', express.static('public'));
+
 //app.set('view engine', 'ejs'); // Change 'ejs' to your desired template engine
+
 app.use('/api/public',express.static(path.join(__dirname, 'public')));
 
-//app.use(express.json({limit:'10kb'})); => limit of data in body not more than 10 KB
-// asdsfasdfsa
+
+
 //request time of API
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -76,13 +80,11 @@ app.use((req, res, next) => {
 
 
 
-app.use('/api/users/',userRouter);
-
-
+app.use('/api/employee/',employeeRouter);
+app.use('/api/company/',companyRouter);
+app.use('/api/task/',taskRouter);
+app.use('/api/typeTask/',kindTaskRouter)
 app.all('*', (req, res, next) => {
-  // const err = new Error(`Can't find the url ${req.originalUrl} on this server`);
-  // err.status='fail';
-  // err.statusCode=404;
   next(
     new AppError(`Can't find the url ${req.originalUrl} on this server`, 404)
   );
