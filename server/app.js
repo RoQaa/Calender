@@ -1,6 +1,6 @@
 const express = require('express');
-const morgan = require('morgan');
-const bodyParser = require('body-parser')
+//const morgan = require('morgan');
+//const bodyParser = require('body-parser')
 const morganBody = require('morgan-body');
 const path=require('path')
 const rateLimit = require('express-rate-limit'); // security
@@ -13,6 +13,7 @@ const employeeRouter=require('./routes/employeeRouter');
 const companyRouter=require('./routes/companyRouter');
 const taskRouter=require('./routes/taskRouter');
 const kindTaskRouter=require('./routes/kindTaskRouter')
+const notificationRouter=require('./routes/notificationRouter')
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
 const app = express();
 
@@ -42,7 +43,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 //Limit requests from same API
-// hna bn3ml limitng l3dd el mrat elly log in 34an  el brute force attacks
+
 const limiter = rateLimit({
   max: 1000,
   windowMs: 60 * 60 * 1000,
@@ -84,6 +85,7 @@ app.use('/api/employee/',employeeRouter);
 app.use('/api/company/',companyRouter);
 app.use('/api/task/',taskRouter);
 app.use('/api/typeTask/',kindTaskRouter)
+app.use('/api/notification/',notificationRouter)
 app.all('*', (req, res, next) => {
   next(
     new AppError(`Can't find the url ${req.originalUrl} on this server`, 404)

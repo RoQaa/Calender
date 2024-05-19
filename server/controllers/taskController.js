@@ -1,7 +1,7 @@
 const Task = require('../models/taskModel');
 const {catchAsync} = require('../utils/catchAsync');
 const AppError = require("../utils/appError");
-//TODO: Update TasksControllers about get task and add type of task from another model
+
 exports.createTask = catchAsync(async (req,res,next)=>{
     req.body.company=req.user.id;
         const task = await Task.create(req.body)

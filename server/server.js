@@ -9,9 +9,9 @@ process.on('uncaughtException', (err) => {
 
 dotenv.config({ path: `${__dirname}/config.env` });
 
-const http = require('http');
+
 const app = require(`${__dirname}/app`);
-const server = http.createServer(app);
+
 
 
 const DB = process.env.DATABASE.replace('<password>',process.env.PASSWORD)
@@ -22,12 +22,16 @@ mongoose
     console.log('DB connection Successfully');
   });
 
-//TODO:Notification and test all routers in postman
+
 
 const port = process.env.PORT || 5000;
-server.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
+const io=require('./utils/socket').init(server);
+io.on('connection', (socket) => {
+  console.log('Socket is connected!');
+})
 
 process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');

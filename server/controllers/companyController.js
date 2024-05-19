@@ -2,11 +2,14 @@ const fs=require('fs');
 const multer = require('multer')
 const sharp = require('sharp');
 const Company=require('../models/companyModel');
+const Employee = require("../models/employeeModel");
+const Task=require('../models/taskModel')
+const Notification=require('../models/notificationModel')
 const {catchAsync}=require('../utils/catchAsync');
 const AppError=require('../utils/AppError');
 const authFactory = require("../utils/authFactory");
-const Employee = require("../models/employeeModel");
 
+//TODO: Test Admin Routes
 
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
@@ -45,11 +48,6 @@ exports.resizeCompanyPhoto = catchAsync(async (req, res, next) => {
     next();
 });
 
-
-
-
-
-
 //Admin
 exports.getCompanys = catchAsync(async(req,res,next)=>{
     const data= await Company.find();
@@ -72,14 +70,17 @@ exports.getOneCompany=catchAsync(async (req,res,next)=>{
     })
 })
 exports.deleteCompanyByAdmin=catchAsync(async (req,res,next)=>{
-    const company = await Company.findById(req.params.id);
+    const companyId=req.params.id
+    const company = await Company.findById(companyId);
 
     fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {
         if(err){
             console.log("Error:delete image ")
         }
     });
-    await Employee.deleteMany({ company: req.user.id });
+    await Employee.deleteMany({ company: companyId });
+    await Task.deleteMany({ company: companyId});
+    await Notification.deleteMany({to:companyId})
     await  company.remove();
 
     res.status(200).json({
@@ -173,7 +174,6 @@ exports.createEmployee=  catchAsync(async (req, res, next) => {
 
 
 });
-
 exports.myProfile=catchAsync(async (req,res,next)=>{
 
     const data = req.user
@@ -186,7 +186,6 @@ exports.myProfile=catchAsync(async (req,res,next)=>{
     })
 
 })
-
 exports.updateMe=catchAsync(async (req,res,next)=>{
     if (req.body.password || req.body.passwordConfirm) {
         return next(
@@ -216,21 +215,24 @@ exports.updateMe=catchAsync(async (req,res,next)=>{
     })
 })
 exports.deleteMe=catchAsync(async (req,res,next)=>{
-    const company = await Company.findById(req.user.id);
+    const companyId=req.user.id
+    const company = await Company.findById(companyId);
 
     fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {
         if(err){
             console.log("Error:delete image ")
         }
     });
-    await Employee.deleteMany({ company: req.user.id });
+    await Employee.deleteMany({ company: companyId });
+    await Task.deleteMany({ company: companyId});
+    await Notification.deleteMany({to:companyId})
+
     await  company.remove();
 
     res.status(200).json({
         status:true,
         message:`Successfully deleted company`,
     })
-
 
 })
 

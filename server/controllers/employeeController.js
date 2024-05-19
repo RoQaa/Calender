@@ -2,6 +2,7 @@ const fs=require('fs');
 const multer = require('multer')
 const sharp = require('sharp');
 const Employee = require('../models/employeeModel');
+const Task=require('../models/taskModel')
 const authFactory=require('../utils/authFactory');
 const {catchAsync}=require('../utils/catchAsync');
 const AppError=require('../utils/AppError');
@@ -119,9 +120,20 @@ exports.updateMe=catchAsync(async(req,res,next)=>{
     })
 })
 exports.deleteMe=catchAsync(async (req,res,next)=>{
-    const emp = await Employee.findById(req.user.id);
+    const employeeId=req.user.id
+    const emp = await Employee.findById(employeeId);
 
     fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${emp.profileImage}`, (err) => {});
+    const empTasks=await Task.find({employee:employeeId})
+    await Promise.all(
+        empTasks.map(async (task) => {
+            // Remove the employee ID from the employee array
+            task.employee.pull(employeeId);
+
+            // Save the updated task
+            await task.save();
+        })
+    )
     await  emp.remove();
 
     res.status(200).json({
@@ -201,13 +213,26 @@ exports.updateByCompanyOrAdmin=catchAsync(async (req,res,next)=>{
 })
 
 exports.deleteByCompanyOrAdmin=catchAsync(async (req,res,next)=>{
-    const emp = await Employee.findById(req.params.id);
+    const employeeId=req.params.id
+    const emp = await Employee.findById(employeeId);
     if(req.user.role!=='admin') {
         if (emp.company.toString() !== req.user.id) {
             return next(new AppError(`that employee not belongs to you`, 400))
         }
     }
     fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${emp.profileImage}`, (err) => {});
+
+    const empTasks=await Task.find({employee:employeeId})
+    await Promise.all(
+        empTasks.map(async (task) => {
+            // Remove the employee ID from the employee array
+            task.employee.pull(employeeId);
+
+            // Save the updated task
+            await task.save();
+        })
+    )
+
     await  emp.remove();
 
     res.status(200).json({
