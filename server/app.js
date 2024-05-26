@@ -1,5 +1,5 @@
 const express = require('express');
-//const morgan = require('morgan');
+const morgan = require('morgan');
 //const bodyParser = require('body-parser')
 const morganBody = require('morgan-body');
 const path=require('path')
@@ -36,10 +36,12 @@ app.use((req, res, next) => {
 
 //development logging
 if (process.env.NODE_ENV === 'development') {
-  // app.use(morgan('dev'));
-  morganBody(app, {
+   app.use(morgan('dev'));
+  /*morganBody(app, {
     logAllReqHeader: true,
   });
+
+   */
 }
 
 //Limit requests from same API

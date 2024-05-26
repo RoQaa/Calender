@@ -8,7 +8,11 @@ const taskSchema= mongoose.Schema({
         type:String,
 
     },
-    dueDate: Date,
+    dueDate: {
+        type:Date,
+     //   default:Date.now(),
+
+    },
     kind:{
         type:mongoose.Schema.ObjectId,
         ref:'KindTask',
@@ -37,6 +41,12 @@ const taskSchema= mongoose.Schema({
     timestamps: true
 });
 //Todo:OPen populate for task
+/*
+taskSchema.pre("save",function (next){
+    this.dueDate=new Date(this.dueDate + 3*60*60*1000)
+    next();
+})
+*/
 
 taskSchema.pre(/^find/,function (next){
     this.populate({

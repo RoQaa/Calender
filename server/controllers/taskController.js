@@ -1,16 +1,34 @@
+const schedule = require('node-schedule');
+const { format } = require('date-fns');
 const Task = require('../models/taskModel');
+const io = require('../utils/socket')
 const {catchAsync} = require('../utils/catchAsync');
 const AppError = require("../utils/appError");
+/*
+// Function to schedule a notification
+const scheduleNotification = (task) => {
 
+    const notificationTime = new Date(task.dueDate.getTime() + 2 * 60 * 1000); // 2 minutes after due date
+    console.log("notificationScheduleTime : ",notificationTime.toISOString())
+    schedule.scheduleJob(notificationTime, () => {
+        io.getIo().emit('notificationSchedule', `Task "${task.name}" is due in 10 minutes`);
+    });
+
+
+};
+
+*/
 exports.createTask = catchAsync(async (req,res,next)=>{
     req.body.company=req.user.id;
-        const task = await Task.create(req.body)
+
+       const task = await Task.create(req.body)
 
 
+ //   scheduleNotification(task)
         res.status(201).json({
             status:true,
             message: 'Task created successfully',
-            data:task,
+          //  data:task,
 
         });
 
