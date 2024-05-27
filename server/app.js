@@ -18,16 +18,15 @@ const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
 const app = express();
 
 // Global MiddleWares
+// Implement CORS
+app.use(cors());
+app.options('*', cors());
 
 //set security http headers
 app.use(helmet()); // set el htttp headers property
 
+app.use(express.urlencoded({ extended: true}));
 
-
-
-app.use(cors());
-
-app.options('*',cors())
 // Poclicy for blocking images
 app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -36,12 +35,12 @@ app.use((req, res, next) => {
 
 //development logging
 if (process.env.NODE_ENV === 'development') {
-   app.use(morgan('dev'));
-  /*morganBody(app, {
+ //  app.use(morgan('dev'));
+  morganBody(app, {
     logAllReqHeader: true,
   });
 
-   */
+   
 }
 
 //Limit requests from same API

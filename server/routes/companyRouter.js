@@ -16,8 +16,9 @@ router.use(authCompanyController.protect);
 router.post('/createEmployee',companyController.createEmployee);
 router.get('/logout',authCompanyController.logOut);
 router.get('/myProfile',companyController.myProfile);
-router.patch('/updateMe',companyController.updateMe);
+router.patch('/updateMe',companyController.uploadUserPhoto,companyController.resizeCompanyPhoto,companyController.updateMe);
 router.patch('/resetPassword',authCompanyController.resetPassword)
+router.patch('/updateMyPassword',companyController.updateMyPassword)
 router.delete('/deleteMe',companyController.deleteMe);
 
 //control employees By Company
