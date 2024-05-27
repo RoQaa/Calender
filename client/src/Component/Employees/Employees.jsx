@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useFormik } from 'formik';
+import { useFormik } from 'formik'
+import React, { useState } from 'react'
 import * as Yup from 'yup'
-import { useNavigate } from 'react-router-dom';
 
-export default function Users() {
+export default function Employees() {
     const [UpdateMood, setUpdateMood] = useState(false)
     const [ResetPassMood, setResetPassMood] = useState(false)
-    const navigate = useNavigate()
 
-    useEffect(() => {
-        console.log(process.env.HAMADA);
-    }, [])
+
 
 
     let validationSchema = Yup.object({
@@ -62,13 +58,6 @@ export default function Users() {
         console.log(values);
     }
 
-
-
-
-
-
-
-
     return <>
 
         {UpdateMood ?
@@ -113,8 +102,6 @@ export default function Users() {
                 </div>
             </div>
             : null}
-
-
         {ResetPassMood ?
             <div className='start-0 end-0 top-0 bottom-0   bg-body-secondary bg-opacity-50 fixed-top row justify-content-center align-content-center'>
                 <div className='col-xl-4 col-lg-6 col-md-8 col-10 formRes'>
@@ -143,9 +130,26 @@ export default function Users() {
             : null}
 
         <div className="container pt-5">
-            <h2 className='text-center mainFont h1'>Company</h2>
+            <h2 className='text-center mainFont h1'>Company data</h2>
+            <div className='w-75 mx-auto row align-items-center justify-content-around '>
+                <div className='col-md-4'>
+                    <div className=''>
+                        <img className='img-fluid rounded-circle shadow-lg p-1 ' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
+                    </div>
+                </div>
+                <div className='col-md-7'>
+                    <div className=''>
+                        <h5 className='fw-bold' >Company Name : </h5>
+                        <p className='ps-4 text-muted'>arcodex development company</p>
+                        <h5 className='fw-bold'>About : </h5>
+                        <p className='ps-4 text-muted'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum delectus dolor accusantium animi consectetur. Officia dicta laboriosam dolor accusamus eaque suscipit provident rerum delectus dolorum?</p>
+
+                    </div>
+                </div>
+            </div>
+            <h2 className='text-center mainFont h1'>Employees</h2>
+
             <div className=' p-5'>
-                <button className='btn mainBtn w-100 mb-2'>Add New Company</button>
                 <table class="table table-striped  table-hover mx-auto text-center ">
                     <thead >
                         <tr >
@@ -158,7 +162,6 @@ export default function Users() {
                         </tr>
                     </thead>
                     <tbody>
-                        
                         <tr className='align-baseline'>
                             <th scope="row" className='mainFont'>1</th>
                             <td className='mainFont'> Mark</td>
@@ -174,17 +177,51 @@ export default function Users() {
                                         <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
                                         <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
                                         <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
-                                        <li onClick={() => { navigate('employees') }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-users me-2"></i>View employees</li>
-
                                     </ul>
                                 </div>
                             </td>
                         </tr>
-                        
+                        <tr className='align-baseline'>
+                            <th scope="row" className='mainFont'>1</th>
+                            <td className='mainFont'> Mark</td>
+                            <td className='mainFont'> Mark@gmail.com</td>
+                            <td className='mainFont '><div className='badge mainRole'>Admin</div> </td>
+
+                            <td>
+                                <div class="dropdown ">
+                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
+                                    </button>
+                                    <ul class="dropdown-menu ">
+                                        <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                                        <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
+                                        <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr className='align-baseline'>
+                            <th scope="row" className='mainFont'>1</th>
+                            <td className='mainFont'> Mark</td>
+                            <td className='mainFont'> Mark@gmail.com</td>
+                            <td className='mainFont '><div className='badge mainRole'>Admin</div> </td>
+
+                            <td>
+                                <div class="dropdown ">
+                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
+                                    </button>
+                                    <ul class="dropdown-menu ">
+                                        <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                                        <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
+                                        <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </>
 }

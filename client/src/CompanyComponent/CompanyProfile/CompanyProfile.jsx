@@ -6,86 +6,130 @@ import { Formik, Form, Field, ErrorMessage, useFormik } from 'formik';
 import { toast } from "react-hot-toast";
 
 
-export default function Profile() {
+export default function CompanyProfile({ setUserData }) {
 
-  
   const [UpdatePasssMood, setUpdatePassMood] = useState(false)
   const [UpdateMood, setUpdateMood] = useState(false)
+
+  const [CompanyData, setCompanyData] = useState({})
   const [Loading, setLoading] = useState(false)
+  const [UpdateLoading, setUpdateLoading] = useState(false)
 
-
-  let token = localStorage.getItem('userToken')
-  let headers = {
+  async function getUserInfo() {
+    setLoading(true)
+    let token = localStorage.getItem('CompanyToken')
+    let headers = {
       Authorization: `Bearer ${token}`
+    }
+    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setUserData(null)
+        toast.error(err?.response?.data?.message)
+        setLoading(false)
+      } else {
+        toast.error(err?.response?.data?.message)
+        setLoading(false)
+      }
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data?.data);
+      setCompanyData(res?.data?.data)
+      setLoading(false)
+    })
   }
 
-
   useEffect(() => {
+    getUserInfo()
   }, [])
 
-
-
-
   async function handleUpdatePass(values) {
-     console.log(values);
+    console.log(values);
   }
 
   let validationSchema = Yup.object({
-      currentPassword: Yup.string().required('currentPassword is required'),
-      newPassword: Yup.string().required('newPassword is required'),
-      newPasswordConfirm: Yup.string().required('newPasswordConfirm is required').equals([Yup.ref('newPassword')], 'you must be like a new password'),
+    currentPassword: Yup.string().required('currentPassword is required'),
+    newPassword: Yup.string().required('newPassword is required'),
+    newPasswordConfirm: Yup.string().required('newPasswordConfirm is required').equals([Yup.ref('newPassword')], 'you must be like a new password'),
   })
   let formik = useFormik({
-      initialValues: {
-          password: {
-              currentPassword: "",
-              newPassword: "",
-              newPasswordConfirm: ""
-          }
-      }
-      ,
-      onSubmit: handleUpdatePass,
-      validationSchema
+    initialValues: {
+      currentPassword: "",
+      newPassword: "",
+      newPasswordConfirm: ""
+    }
+    ,
+    onSubmit: handleUpdatePass,
+    validationSchema
   })
 
 
 
 
   async function handleUpdateData(values) {
-      console.log(values);
 
+    console.log(values);
+    setUpdateLoading(true)
+    let token = localStorage.getItem('CompanyToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    let formData = new FormData()
+    if (values?.profileImage != "") {
+      formData.append('profileImage', values?.profileImage)
+
+    }
+    formData.append('name', values.name)
+    formData.append('about', values.about)
+    console.log(formData);
+    // await axios.patch(`http://localhost:5000/api/company/updateMe`, formData,{ headers }).catch((err) => {
+    //   if (err?.response?.status == 401) {
+    //     localStorage.clear()
+    //     setUserData(null)
+    //     toast.error(err?.response?.data?.message)
+    //     setUpdateLoading(false)
+    //   } else {
+    //     toast.error(err?.response?.data?.message)
+    //     setUpdateLoading(false)
+    //   }
+    // }).then((res) => {
+    //   console.log(res);
+    //   console.log(res?.data);
+    //   setUpdateLoading(false)
+    // })
   }
 
   let validationDataSchema = Yup.object({
-      name: Yup.string().required('name is required'),
-      profileImage: Yup.mixed().required('profile Image is required'),
-
+    name: Yup.string().required('name is required'),
+    about: Yup.string().required('about is required'),
+    profileImage: Yup.mixed().required('profile Image is required'),
   })
-  
+
   let formik2 = useFormik({
-      initialValues: {
-          data: {
-              name: "",
-              profileImage: "",
-          }
-      }
-      ,
-      onSubmit: handleUpdateData,
-      validationDataSchema
+    initialValues: {
+      name: "",
+      profileImage: "",
+      about: ""
+    }
+    ,
+    onSubmit: handleUpdateData,
+    validationSchema: validationDataSchema
   })
-
-
 
   return <>
     {UpdateMood ? <div className='start-0 end-0 top-0 bottom-0 bg-body-secondary bg-opacity-50 fixed-top row justify-content-center align-content-center'>
       <div className="col-xl-4 col-lg-6 col-md-8 col-10 formRes">
         <form onSubmit={formik2.handleSubmit} className='w-100 bg-light  p-5 rounded-3 shadow '>
 
-          <label for="name" class="form-label">name</label>
+          <label for="name" className="form-label">name</label>
           <input className='form-control' type="text" name='name' id='name' value={formik2.values.name} onChange={formik2.handleChange} onBlur={formik2.handleBlur} />
           {formik2.errors.name && formik2.touched.name ? <div className='form-text text-danger'>{formik2.errors.name}</div> : null}
 
-          <label for="profileImage" class="form-label">profileImage</label>
+          <label for="about" className="form-label">about</label>
+          <input className='form-control' type="text" name='about' id='about' value={formik2.values.about} onChange={formik2.handleChange} onBlur={formik2.handleBlur} />
+          {formik2.errors.about && formik2.touched.about ? <div className='form-text text-danger'>{formik2.errors.about}</div> : null}
+
+          <label for="profileImage" className="form-label">profileImage</label>
           <input
             onChange={(event) => formik2.setFieldValue('profileImage', event.currentTarget.files[0])}
             className='form-control'
@@ -99,7 +143,7 @@ export default function Profile() {
 
 
           <div className='row my-2 g-3'>
-            {Loading ?
+            {UpdateLoading ?
               <button type='button' className='btn btn-outline-success col-12  '><i className='fa fa-spinner fa-spin'></i></button>
               : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn btn-outline-success col-12 '>save changes</button>
             }
@@ -141,42 +185,25 @@ export default function Profile() {
       </div>
     </div> : null}
 
+
     <div className='container pt-5'>
       <h2 className='text-center mainFont h1'>Profile</h2>
 
-      <div className='col-12   mx-auto justify-content-evenly  p-5 rounded-5 mt-5 mainFont'>
+      <div className='col-12   mx-auto justify-content-evenly  p-5 rounded-5  mainFont'>
         <div className="row profileRes">
-          <div  data-wow-duration="1s" data-wow-delay="0.5s" className='col-lg-4 profileRes1  mx-auto text-center  p-5 shadow-lg rounded-4 wow fadeIn'>
+          <div className='col-lg-8 profileRes1  mx-auto text-center  p-5 shadow-lg rounded-4 wow fadeIn'>
             <div className='col-9 mx-auto'>
-
-              <img className='img-fluid rounded-circle shadow-lg ' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
+              <img className='img-fluid rounded-circle shadow-lg mainColor p-1' src={CompanyData.profileImage} alt="" />
             </div>
-            <h3 className='mt-3 fw-bolder text-capitalize'>Mohamed</h3>
-            <p>Admin</p>
-            <button onClick={() => { setUpdateMood(true) }}  className='btn mainBtn2 rounded-5 col-8 my-2'>Update Profile</button>
+            <h3 className='fw-bolder text-capitalize mt-2'>{CompanyData.name}</h3>
+            <p>{CompanyData.about}</p>
+            <div className="row justify-content-evenly">
+              <button onClick={() => { setUpdateMood(true) }} className='btn mainBtn2 rounded-5 col-md-3 my-2'>Update Profile</button>
+              <button onClick={() => { setUpdatePassMood(true) }} className='btn mainBtn2 rounded-5 col-md-3 my-2'>Update  Password</button>
 
-          </div>
-          <div className='col-lg-6 profileRes1  align-self-center  text-center mx-auto mt-4 mainFont '>
-            <table class="table table-striped table-hover text-center shadow-lg rounded-5 overflow-hidden">
-              <tbody>
-                <tr className='align-baseline '>
-                  <td className='mainFont'>Name</td>
-                  <td className='mainFont'>Mohamed ashraf</td>
-                </tr>
-                <tr className='align-baseline'>
-                  <td className='mainFont'>Email</td>
-                  <td className='mainFont'>mohamde@gmail.com</td>
-                </tr>
-                <tr className='align-baseline'>
-                  <td className='mainFont'>Role</td>
-                  <td className='mainFont'>Admin</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="row justify-content-evenly ">
-              <button onClick={() => { setUpdatePassMood(true) }} className='btn mainBtn2 my-3 col-5 rounded-5'>Update Password</button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
