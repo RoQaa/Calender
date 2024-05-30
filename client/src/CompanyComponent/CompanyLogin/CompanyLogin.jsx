@@ -1,11 +1,11 @@
 import { useFormik } from 'formik';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import axios from 'axios'
 import { toast } from "react-hot-toast";
 
-export default function CompanyLogin({saveData}) {
+export default function CompanyLogin({ saveData }) {
     let navigate = useNavigate()
     const [messageErr2, setmessageErr2] = useState('')
     const [loading, setloading] = useState(false)
@@ -13,6 +13,14 @@ export default function CompanyLogin({saveData}) {
     const [ForgetMode, setForgetMode] = useState(false)
     const [SignUpMode, setSignUpMode] = useState(false)
 
+    useEffect(() => {
+        if (localStorage.getItem('CompanyToken') != null) {
+            navigate('/')
+        }
+    }, [])
+
+
+    //  handle LoginData
     async function handleLoginData(values) {
         console.log(values);
         setloading(true)
@@ -55,6 +63,9 @@ export default function CompanyLogin({saveData}) {
         validationSchema: validationDataSchema
     })
 
+
+    // handel handleForgetPassData
+
     async function handleForgetPassData(values) {
         console.log(values);
     }
@@ -74,34 +85,50 @@ export default function CompanyLogin({saveData}) {
         validationSchema: validationForgetPassSchema
     })
 
+    // handel signUp
+
     async function handleSignupData(values) {
         console.log(values);
+        setloading(true)
+        let { data } = await axios.post('http://localhost:5000/api/company/signUp', values).catch((err) => {
+            setmessageErr2(`${err.response.message}`)
+            setloading(false)
+            toast.error(err.response.data.message)
+        })
+        console.log(data);
+        if (data.status == true && data.data.role == 'company') {
+            localStorage.setItem('CompanyToken', data.token)
+            saveData()
+            navigate('/')
+            setloading(false)
+            toast.success(data.message)
+        } else {
+            toast.error(data.message)
+            setloading(false)
+
+        }
 
     }
 
     let validationSignUpSchema = Yup.object({
         name: Yup.string().required('name is required'),
         email: Yup.string().required('email is required'),
-        phone: Yup.string().required('phone is required'),
+        NumberPhone: Yup.string().required('phone is required'),
         about: Yup.string(),
         password: Yup.string().required('password is required'),
-        confirmPassword: Yup.string().required('confirmPassword is required').equals([Yup.ref('password')], 'you must be like a new password'),
+        passwordConfirm: Yup.string().required('confirmPassword is required').equals([Yup.ref('password')], 'you must be like a new password'),
         profileImage: Yup.mixed()
     })
 
     let formik = useFormik({
         initialValues: {
-            data: {
-                name: "",
-                email: "",
-                password: "",
-                confirmPassword: "",
-                phone: "",
-                about: "",
-                profileImage: ""
-
-
-            }
+            name: "",
+            email: "",
+            password: "",
+            passwordConfirm: "",
+            NumberPhone: "",
+            about: "",
+            profileImage: ""
         }
         ,
         onSubmit: handleSignupData,
@@ -186,9 +213,9 @@ export default function CompanyLogin({saveData}) {
                         </div>
                         <div className='py-1'>
 
-                            <label for="phone" class="form-label fw-bold">Company phone</label>
-                            <input className='form-control' type="tel" name='phone' id='phone' value={formik.values.phone} onChange={formik.handleChange} onBlur={formik.handleBlur} />
-                            {formik.errors.phone && formik.touched.phone ? <div className='form-text text-danger'>{formik.errors.phone}</div> : null}
+                            <label for="NumberPhone" class="form-label fw-bold">Company NumberPhone</label>
+                            <input className='form-control' type="tel" name='NumberPhone' id='NumberPhone' value={formik.values.NumberPhone} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                            {formik.errors.NumberPhone && formik.touched.NumberPhone ? <div className='form-text text-danger'>{formik.errors.NumberPhone}</div> : null}
                         </div>
 
                         <div className='py-1'>
@@ -205,9 +232,9 @@ export default function CompanyLogin({saveData}) {
                         </div>
                         <div className='py-1'>
 
-                            <label for="confirmPassword" class="form-label fw-bold">confirm Password</label>
-                            <input className='form-control' type="password" name='confirmPassword' id='confirmPassword' value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur} />
-                            {formik.errors.confirmPassword && formik.touched.confirmPassword ? <div className='form-text text-danger'>{formik.errors.confirmPassword}</div> : null}
+                            <label for="passwordConfirm" class="form-label fw-bold">confirm Password</label>
+                            <input className='form-control' type="password" name='passwordConfirm' id='passwordConfirm' value={formik.values.passwordConfirm} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                            {formik.errors.passwordConfirm && formik.touched.passwordConfirm ? <div className='form-text text-danger'>{formik.errors.passwordConfirm}</div> : null}
                         </div>
                         <div className='py-1'>
 

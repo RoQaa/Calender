@@ -4,17 +4,21 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
 import { toast } from "react-hot-toast";
+import Select from 'react-select';
 
-export default function AddTask({setUserData}) {
+export default function AddTask({ setUserData }) {
 
-  const [CompanyEmployes, setCompanyEmployes] = useState([])
+  const [employeeOptions, setemployeeOptions] = useState([])
+
   const [taskTypes, settaskTypes] = useState([])
   const [Loading, setLoading] = useState(false)
+  const [EmployesLoading, setEmployesLoading] = useState(false)
   let navigate = useNavigate()
 
 
 
   async function getCompanyEmployes() {
+    setEmployesLoading(true)
     let token = localStorage.getItem('CompanyToken')
     let headers = {
       Authorization: `Bearer ${token}`
@@ -23,15 +27,23 @@ export default function AddTask({setUserData}) {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
+        setEmployesLoading(false)
+
         toast.error(err?.response?.data?.message)
       } else {
+        setEmployesLoading(false)
         toast.error(err?.response?.data?.message)
       }
     }).then((res) => {
       console.log(res);
-      console.log(res.data.data);
-      setCompanyEmployes(res.data.data)
-      console.log(CompanyEmployes);
+      console.log(res?.data?.data);
+      setemployeeOptions(res?.data?.data?.map((employee) => ({
+        value: employee._id,
+        label: employee.email, 
+      })))
+      console.log(employeeOptions);
+      setEmployesLoading(false)
+
 
     })
   }
@@ -40,15 +52,14 @@ export default function AddTask({setUserData}) {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
-
         toast.error(err?.response?.data?.message)
       } else {
         toast.error(err?.response?.data?.message)
       }
     }).then((res) => {
       console.log(res);
-      console.log(res.data.data);
-      settaskTypes(res.data.data)
+      console.log(res?.data?.data);
+      settaskTypes(res?.data?.data)
       console.log(taskTypes);
 
     })
@@ -60,11 +71,11 @@ export default function AddTask({setUserData}) {
 
 
   async function handleAdd(values) {
-    
+
     const myTime = `${values.date}T${values.time}:00`
     console.log(values);
     console.log(myTime);
-    const NewDate= new Date(myTime)
+    const NewDate = new Date(myTime)
     console.log(NewDate);
     setLoading(true)
     let token = localStorage.getItem('CompanyToken')
@@ -77,13 +88,12 @@ export default function AddTask({setUserData}) {
       dueDate: NewDate,
       kind: values.kind,
       priority: values.priority,
-      employee: [values.employee]
+      employee: values.employee
 
     }, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
-
         setLoading(false)
 
         toast.error(err?.response?.data?.message)
@@ -97,7 +107,7 @@ export default function AddTask({setUserData}) {
       console.log(res.data.data);
       toast.success(res.data.message)
       setLoading(false)
-       navigate('/comapnyTasks')
+      navigate('/comapnyTasks')
       formik.resetForm()
 
     })
@@ -111,7 +121,7 @@ export default function AddTask({setUserData}) {
     time: Yup.string().required('time is required'),
     kind: Yup.string().required('Task type is required'),
     priority: Yup.string().required('priority  is required'),
-    employee: Yup.string().required('employee  is required'),
+    employee: Yup.array().required('employee  is required'),
   })
 
   let formik = useFormik({
@@ -130,6 +140,8 @@ export default function AddTask({setUserData}) {
     onSubmit: handleAdd,
     validationSchema
   })
+
+
 
 
 
@@ -188,14 +200,41 @@ export default function AddTask({setUserData}) {
 
         <label for="employee" class="form-label mainFont mt-2 ">Employes</label>
 
-        <select class="form-select" aria-label="Default select example" name='employee' id='employee' value={formik.values.employee} onChange={formik.handleChange} onBlur={formik.handleBlur}>
+        {EmployesLoading ? <div className='col-12 text-center my-5 py-5'>
+          <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
+        </div> : <> 
+
+        <Select
+          id="employee"
+          name="employee"
+          options={employeeOptions}
+          isMulti
+          value={formik?.values?.employee?.map((employeeId) =>
+            employeeOptions.find((option) => option.value === employeeId)
+          )}
+          onChange={(selectedOptions) => {
+            formik.setFieldValue(
+              'employee',
+              selectedOptions ? selectedOptions?.map((option) => option.value) : []
+            );
+          }}
+          onBlur={formik.handleBlur}
+          className=""
+        />
+        
+          </>}
+
+
+
+
+        {/* <select  class="form-select" aria-label="Default select example" name='employee' id='employee' multiple value={formik.values.employee} onChange={formik.handleChange} onBlur={formik.handleBlur}>
           <option disabled selected>select Employe</option>
 
           {CompanyEmployes.map((employe) => {
             return <option value={employe._id}>{employe.email}</option>
           })}
 
-        </select>
+        </select> */}
 
         <div className='row my-2 g-3'>
           {Loading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>

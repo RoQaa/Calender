@@ -10,16 +10,16 @@ export default function CompanyScren({ setUserData }) {
     const [UpdateMood, setUpdateMood] = useState(false)
     const [ResetPassMood, setResetPassMood] = useState(false)
     const [CompanyEmployes, setCompanyEmployes] = useState([])
-    
-    
+
+
     const [EmployesLoading, setEmployesLoading] = useState(false)
     const [updateLoading, setupdateLoading] = useState(false)
     const [resetLoading, setresetLoading] = useState(false)
-    
-    
-    
-    
-    
+
+
+
+
+
     const [CompanyData, setCompanyData] = useState({})
     const [Loading, setLoading] = useState(false)
 
@@ -43,6 +43,8 @@ export default function CompanyScren({ setUserData }) {
             console.log(res);
             console.log(res?.data?.data);
             setCompanyData(res?.data?.data)
+            getUserEmployes()
+
             setLoading(false)
         })
     }
@@ -74,8 +76,10 @@ export default function CompanyScren({ setUserData }) {
     }
 
     useEffect(() => {
-        getUserInfo()
-        getUserEmployes()
+        if (localStorage.getItem('CompanyToken') != null) {
+            getUserInfo()
+        }
+
     }, [])
 
 
@@ -216,7 +220,7 @@ export default function CompanyScren({ setUserData }) {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.delete(`http://localhost:5000/api/company/deleteEmployee/${_id}`,{ headers }).catch((err) => {
+        await axios.delete(`http://localhost:5000/api/company/deleteEmployee/${_id}`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 console.log(err);
                 localStorage.clear()
@@ -310,9 +314,9 @@ export default function CompanyScren({ setUserData }) {
                         <div className='col-md-7'>
                             <div className=''>
                                 <h5 className='fw-bold' >Company Name : Arcodex development </h5>
-                                <p className='ps-4 text-muted'>{CompanyData.name}</p>
+                                <p className='ps-4 text-muted'>{CompanyData?.name}</p>
                                 <h5 className='fw-bold'>About : </h5>
-                                <p className='ps-4 text-muted'>{CompanyData.about}</p>
+                                <p className='ps-4 text-muted'>{CompanyData?.about}</p>
 
                             </div>
                         </div>
@@ -322,8 +326,8 @@ export default function CompanyScren({ setUserData }) {
                     <div className='p-5 w-100 text-start'>
                         {EmployesLoading ? <div className='col-12 text-center my-5 py-5'>
                             <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-                        </div> :
-                            <div className=' '><table className="table table-striped  table-hover text-center py-5">
+                        </div> : <>
+                            {CompanyEmployes?.length != 0 ? <div className=''><table className="table table-striped  table-hover text-center py-5 ">
                                 <thead >
                                     <tr >
                                         <th scope="col" className='mainFont' >#</th>
@@ -351,7 +355,7 @@ export default function CompanyScren({ setUserData }) {
                                                         <i class="fa-solid fa-list fa-0 mainFont"></i>
                                                     </button>
                                                     <ul class="dropdown-menu ">
-                                                        <li onClick={() => { deleteEmploye(employe._id) }}  className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                                                        <li onClick={() => { deleteEmploye(employe._id) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
                                                         <li onClick={() => { getUpdateData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
                                                         <li onClick={() => { getResetData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
                                                         <Link to={'/employeProfile/' + employe._id} className='text-decoration-none' >
@@ -370,7 +374,13 @@ export default function CompanyScren({ setUserData }) {
 
 
                                 </tbody>
-                            </table></div>
+                            </table></div> : <div className='col-12 text-center my-5 py-5'>
+                                <h3 className='mainFont'>Don't have Employes</h3>
+                                <Link to='/addEmploye' className='btn mainBtn rounded-pill my-2 col-4 mx-auto '>Add Employe</Link>
+
+                            </div>}
+                        </>
+
                         }
                     </div>
                 </>}

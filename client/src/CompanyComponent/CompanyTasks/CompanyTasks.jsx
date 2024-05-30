@@ -3,8 +3,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom';
 
-export default function ComapnyTasks({setUserData}) {
+export default function ComapnyTasks({ setUserData }) {
 
   const [UpdateMood, setUpdateMood] = useState(false)
   const [AssignToMood, setAssignToMood] = useState(false)
@@ -13,6 +14,10 @@ export default function ComapnyTasks({setUserData}) {
   const [LoadingTasks, setLoadingTasks] = useState(false)
   const [UpdateLoading, setUpdateLoading] = useState(false)
   const [TasksType, setTasksType] = useState([])
+  const [AssignToList, setAssignToList] = useState([])
+  const [AssignLoading, setAssignLoading] = useState(false)
+
+
 
 
 
@@ -36,9 +41,9 @@ export default function ComapnyTasks({setUserData}) {
       }
     }).then((res) => {
       console.log(res);
-      console.log(res.data.data);
-      setTasks(res.data.data)
-      const splitDateTimeArray = res.data.data.map(task => {
+      console.log(res?.data?.data);
+      setTasks(res?.data?.data)
+      const splitDateTimeArray = res?.data?.data?.map(task => {
         const [date, timeWithMilliseconds] = task.dueDate.split('T');
         const time = timeWithMilliseconds.split('.')[0];
         return { date, time };
@@ -50,7 +55,7 @@ export default function ComapnyTasks({setUserData}) {
 
     })
   }
-  
+
   async function getTaskType() {
     let token = localStorage.getItem('CompanyToken')
     let headers = {
@@ -67,8 +72,8 @@ export default function ComapnyTasks({setUserData}) {
       }
     }).then((res) => {
       console.log(res);
-      console.log(res.data.data);
-      setTasksType(res.data.data)
+      console.log(res?.data?.data);
+      setTasksType(res?.data?.data)
     })
   }
   useEffect(() => {
@@ -134,8 +139,8 @@ export default function ComapnyTasks({setUserData}) {
       }
     }).then((res) => {
       console.log(res);
-      console.log(res.data.data);
-      toast.success(res.data.message)
+      console.log(res?.data?.data);
+      toast.success(res?.data?.message)
       getTasks()
       setUpdateLoading(false)
       setUpdateMood(false)
@@ -161,28 +166,60 @@ export default function ComapnyTasks({setUserData}) {
 
   }
 
-
   async function deleteTask(_id) {
     let token = localStorage.getItem('CompanyToken')
     let headers = {
-        Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`
     }
-    await axios.delete(`http://localhost:5000/api/task/deleteTask/${_id}`,{ headers }).catch((err) => {
-        if (err?.response?.status == 401) {
-            console.log(err);
-            localStorage.clear()
-            setUserData(null)
-            toast.error(err?.response?.data?.message)
-        } else {
-            console.log(err);
-            toast.error(err?.response?.data?.message)
-        }
+    await axios.delete(`http://localhost:5000/api/task/deleteTask/${_id}`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        console.log(err);
+        localStorage.clear()
+        setUserData(null)
+        toast.error(err?.response?.data?.message)
+      } else {
+        console.log(err);
+        toast.error(err?.response?.data?.message)
+      }
     }).then((res) => {
-        console.log(res);
-        toast.success(res?.data?.message)
-        getTasks()
+      console.log(res);
+      toast.success(res?.data?.message)
+      getTasks()
     })
-}
+  }
+
+  async function GetAssignTo(_id, index) {
+    setAssignLoading(true)
+    setAssignToMood(true)
+
+    let token = localStorage.getItem('CompanyToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    await axios(`http://localhost:5000/api/task/getOneTask/${_id}`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setUserData(null)
+        setAssignLoading(false)
+
+        toast.error(err?.response?.data?.message)
+      } else {
+        setAssignLoading(false)
+
+        toast.error(err?.response?.data?.message)
+      }
+    }).then((res) => {
+      console.log(res);
+      // console.log(res?.data?.data);
+
+      res.data.data.date = CompanyEmployeTasksTime[index].date
+      res.data.data.time = CompanyEmployeTasksTime[index].time
+      setAssignToList(res?.data?.data)
+      console.log(res?.data?.data);
+      setAssignLoading(false)
+    })
+  }
+
 
 
   return <>
@@ -244,79 +281,101 @@ export default function ComapnyTasks({setUserData}) {
     {AssignToMood ?
       <div className='start-0 end-0 top-0 bottom-0   bg-body-secondary bg-opacity-50 fixed-top row justify-content-center align-content-center'>
         <div className='col-xl-4 col-lg-6 col-md-8 col-10 formRes'>
-          <div className='my-5  p-5 bg-light rounded-3 shadow mainFont'>
-            <table class="table table-striped  table-hover mx-auto text-center w-100 rounded-3  ">
-              <thead >
-                <tr >
-                  <th scope="col" className='mainFont' >#</th>
-                  <th scope="col" className='mainFont'>Name</th>
-                  <th scope="col" className='mainFont'>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className='align-baseline'>
-                  <th scope="row" className='mainFont'>1</th>
-                  <td className='mainFont'>mohamed</td>
-                  <td className='mainFont'>mohamed@gmail.com</td>
-                </tr>
-                <tr className='align-baseline'>
-                  <th scope="row" className='mainFont'>1</th>
-                  <td className='mainFont'>mohamed</td>
-                  <td className='mainFont'>mohamed@gmail.com</td>
-                </tr>
+          <div className='my-5  p-5 bg-light rounded-3 shadow mainFont '>
+            {AssignLoading ? <div className='col-12 text-center my-5 py-5'>
+              <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
+            </div> :
+              <>
+                <h3>{AssignToList.name}</h3>
+                <p><span className='fw-bolder'>Description:</span>  {AssignToList.description}</p>
+                <p><span className='fw-bolder'>Time:</span>  {AssignToList.time}</p>
+                <p><span className='fw-bolder'>Date:</span>  {AssignToList.date}</p>
+                <p><span className='fw-bolder'>Task Type:</span> {AssignToList.kind.name}</p>
+                <p><span className='fw-bolder'>Employees:</span>  </p>
+                <table class="table table-striped  table-hover mx-auto text-center w-100 rounded-3  ">
+                  <thead >
+                    <tr >
+                      <th scope="col" className='mainFont' >#</th>
+                      <th scope="col" className='mainFont'>Name</th>
+                      <th scope="col" className='mainFont'>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {AssignToList?.employee.map((employe, index) => {
+                      return <tr className='align-baseline'>
+                        <th scope="row" className='mainFont'>{index + 1}</th>
+                        <td className='mainFont'>{employe.name}</td>
+                        <td className='mainFont'>{employe.email}</td>
+                      </tr>
+                    })}
 
-              </tbody>
-            </table>
-            <button onClick={() => { setAssignToMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>Back</button>
+
+
+                  </tbody>
+                </table>
+                <button onClick={() => { setAssignToMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>Back</button>
+              </>
+            }
+
           </div>
         </div>
       </div>
       : null}
 
-    <div className='container pt-5'>
+    <div className='container pt-5 '>
       <h2 className='text-center mainFont h1'>Company Tasks</h2>
       <div className='p-5'>
         {LoadingTasks ? <div className='col-12 text-center my-5 py-5'>
           <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-        </div> : <div className='table-responsive'><table class="table table-striped  table-hover mx-auto text-center mb-5">
-          <thead >
-            <tr >
-              <th scope="col" className='mainFont' >#</th>
-              <th scope="col" className='mainFont'>title</th>
-              <th scope="col" className='mainFont'>date</th>
-              <th scope="col" className='mainFont'>time</th>
-              <th scope="col" className='mainFont'>Tasktype</th>
-              <th scope="col" className='mainFont'>Acthions</th>
+        </div> : <>
+          {Tasks?.length != 0 ? <div className=''><table class="table table-striped  table-hover mx-auto text-center mb-5 ">
+            <thead >
+              <tr >
+                <th scope="col" className='mainFont' >#</th>
+                <th scope="col" className='mainFont'>title</th>
+                <th scope="col" className='mainFont'>date</th>
+                <th scope="col" className='mainFont'>time</th>
+                <th scope="col" className='mainFont'>Tasktype</th>
+                <th scope="col" className='mainFont'>Acthions</th>
 
-            </tr>
-          </thead>
-          <tbody>
-            {Tasks.map((task, index) => {
-              return <tr className='align-baseline'>
-                <th scope="row" className='mainFont'>{index + 1}</th>
-                <td className='mainFont'>{task.name}</td>
-                <td className='mainFont'>{CompanyEmployeTasksTime[index].date}</td>
-                <td className='mainFont'>{CompanyEmployeTasksTime[index].time}</td>
-                <td className='mainFont'>{task.kind.name}</td>
-                <td>
-                  <div class="dropdown">
-                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="fa-solid fa-list fa-0 mainFont"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li onClick={()=>{deleteTask(task._id)}} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
-                      <li onClick={()=>{handelUpdatedData(index)}} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
-                    </ul>
-                  </div>
-                </td>
               </tr>
-            })}
+            </thead>
+            <tbody>
+              {Tasks?.map((task, index) => {
+                return <tr className='align-baseline'>
+                  <th scope="row" className='mainFont'>{index + 1}</th>
+                  <td className='mainFont'>{task.name}</td>
+                  <td className='mainFont'>{CompanyEmployeTasksTime[index].date}</td>
+                  <td className='mainFont'>{CompanyEmployeTasksTime[index].time}</td>
+                  <td className='mainFont'>{task.kind.name}</td>
+                  <td>
+                    <div class="dropdown">
+                      <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-list fa-0 mainFont"></i>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li onClick={() => { deleteTask(task._id) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                        <li onClick={() => { handelUpdatedData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
+                        <li onClick={() => { GetAssignTo(task._id, index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-eye me-2"></i>Assign to</li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              })}
 
 
 
 
-          </tbody>
-        </table></div>}
+            </tbody>
+          </table></div> : <div className='col-12 text-center my-5 py-5'>
+            <h3 className='mainFont'>Don't have Tasks</h3>
+            <Link to='/addTask' className='btn mainBtn rounded-pill my-2 col-4 mx-auto '>Add Task</Link>
+
+          </div>}
+
+
+        </>
+        }
       </div>
     </div>
   </>

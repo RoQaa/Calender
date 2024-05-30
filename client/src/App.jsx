@@ -25,6 +25,7 @@ import CompanyWelcomeii from './CompanyComponent/CompanyWelcomeii/CompanyWelcome
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios'
 import ProtactecdRoute from './CompanyComponent/ProtactecdRoute/ProtactecdRoute.jsx';
+import ProtactecdAdminRoute from './Component/ProtactecdAdminRoute/ProtactecdAdminRoute.jsx';
 
 // import {config}from 'dotenv'
 
@@ -40,7 +41,7 @@ function App() {
   function saveData() {
     setUserData(localStorage.getItem('CompanyToken'))
   }
-  
+
   function saveAdminData() {
     setAdminData(localStorage.getItem('AdminToken'))
   }
@@ -55,7 +56,10 @@ function App() {
         localStorage.clear()
         setUserData(null)
         toast.error(err?.response?.data?.message)
+        console.log(err?.response?.data?.message);
+
       } else {
+        console.log(err?.response?.data?.message);
         toast.error(err?.response?.data?.message)
       }
     }).then((res) => {
@@ -88,6 +92,10 @@ function App() {
       saveData()
       getUserInfo()
     }
+    if (localStorage.getItem('AdminToken') != null) {
+      saveAdminData()
+      getAdminInfo()
+    }
   }, [])
 
 
@@ -95,27 +103,27 @@ function App() {
   let routes = createBrowserRouter([
     {
       path: 'arc-admin', element: <Layout />, children: [
-        { index: true, element: <Users /> },
-        { path: 'addTaskType', element: <AddTaskType /> },
-        { path: 'createAccount', element: <CreateAccount /> },
-        { path: 'addCompany', element: <AddCompany /> },
-        { path: 'profile', element: <Profile /> },
-        { path: 'sendNotifications', element: <SendNotifications /> },
-        { path: 'employees', element: <Employees /> },
+        { index: true, element: <ProtactecdAdminRoute><Users /></ProtactecdAdminRoute> },
+        { path: 'addTaskType', element: <ProtactecdAdminRoute> <AddTaskType /></ProtactecdAdminRoute> },
+        { path: 'createAccount', element: <ProtactecdAdminRoute> <CreateAccount /></ProtactecdAdminRoute> },
+        { path: 'addCompany', element: <ProtactecdAdminRoute> <AddCompany /> </ProtactecdAdminRoute> },
+        { path: 'profile', element: <ProtactecdAdminRoute> <Profile /> </ProtactecdAdminRoute> },
+        { path: 'sendNotifications', element: <ProtactecdAdminRoute> <SendNotifications /></ProtactecdAdminRoute> },
+        { path: 'employees', element: <ProtactecdAdminRoute> <Employees /></ProtactecdAdminRoute> },
         { path: 'login', element: <Login /> },
-        { path: '*', element: <NotFound /> }
+        { path: '*', element: <ProtactecdAdminRoute> <NotFound /></ProtactecdAdminRoute> }
       ]
     },
     {
-      path: '', element: <CompanyLayout userData={userData} setUserData={setUserData}/>,
+      path: '', element: <CompanyLayout setUserData={setUserData} />,
       children: [
         { index: true, element: <ProtactecdRoute> <CompanyScren setUserData={setUserData} /></ProtactecdRoute> },
-        { path: 'addEmploye', element: <ProtactecdRoute> <AddEmploye setUserData={setUserData}/> </ProtactecdRoute> },
+        { path: 'addEmploye', element: <ProtactecdRoute> <AddEmploye setUserData={setUserData} /> </ProtactecdRoute> },
         { path: 'addTask', element: <ProtactecdRoute> <AddTask setUserData={setUserData} /> </ProtactecdRoute> },
-        { path: 'comapnyTasks', element: <ProtactecdRoute> <ComapnyTasks setUserData={setUserData}/></ProtactecdRoute> },
-        { path: 'companyProfile', element: <ProtactecdRoute> <CompanyProfile setUserData={setUserData}/></ProtactecdRoute> },
-        { path: 'companyLogin', element:  <CompanyLogin saveData={saveData}/> },
-        { path: 'employeProfile/:id', element: <ProtactecdRoute> <EmployeProfile setUserData={setUserData}/> </ProtactecdRoute> },
+        { path: 'comapnyTasks', element: <ProtactecdRoute> <ComapnyTasks setUserData={setUserData} /></ProtactecdRoute> },
+        { path: 'companyProfile', element: <ProtactecdRoute> <CompanyProfile setUserData={setUserData} /></ProtactecdRoute> },
+        { path: 'companyLogin', element: <CompanyLogin saveData={saveData} /> },
+        { path: 'employeProfile/:id', element: <ProtactecdRoute> <EmployeProfile setUserData={setUserData} /> </ProtactecdRoute> },
 
 
       ]

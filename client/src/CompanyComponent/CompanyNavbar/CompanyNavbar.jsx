@@ -2,23 +2,23 @@ import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
-export default function CompanyNavbar({userData, setUserData}) {
-  
-  let navigate = useNavigate()
+export default function CompanyNavbar({ setUserData }) {
+  const navigate = useNavigate()
   let token = localStorage.getItem('CompanyToken')
   let headers = {
-      // 'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${token}`
+    // 'Content-Type': 'multipart/form-data',
+    Authorization: `Bearer ${token}`
   }
- async function logOut() {
-      let { data } = await axios(`http://localhost:5000/api/company/logout`,{ headers })
-      localStorage.clear()
-      setUserData(null)
-      console.log(data);
+  async function logOut() {
+    let { data } = await axios(`http://localhost:5000/api/company/logout`, { headers })
+    localStorage.clear()
+    setUserData(null)
+    navigate('/companyLogin')
+    console.log(data);
   }
 
-  
-  
+
+
   return <>
     <nav className="navbar navbar-expand-lg mainColor text-white text-center px-5 ">
       <div className="container   ">
@@ -59,7 +59,7 @@ export default function CompanyNavbar({userData, setUserData}) {
 
           <ul className="navbar-nav ms-auto    mb-lg-0 text-white   text-uppercase align-items-center">
             <li className="nav-item">
-              <Link onClick={()=>{logOut()}} className="nav-link text-white" to='companyLogin'>Logout</Link>
+              <Link onClick={() => { logOut() }} className="nav-link text-white" to='companyLogin'>Logout</Link>
             </li>
           </ul>
 
