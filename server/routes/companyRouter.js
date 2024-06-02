@@ -35,6 +35,7 @@ router.get('/getCompanies',companyController.getCompanys);
 router.get('/getOneCompany/:id',companyController.getOneCompany)
 router.delete('/deleteByAdmin/:id',companyController.deleteCompanyByAdmin);
 router.patch('/updateByAdmin/:id',companyController.uploadUserPhoto,companyController.resizeCompanyPhoto,companyController.updateCompanyByAdmin);
+router.patch('/resetCompanyPassword/:id',companyController.resetCompanyPassword)
 router.post('/createCompany',companyController.createCompany);
 
 // Admin Authorizations employees

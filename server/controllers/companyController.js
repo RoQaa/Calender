@@ -50,12 +50,13 @@ exports.resizeCompanyPhoto = catchAsync(async (req, res, next) => {
 
 //Admin
 exports.getCompanys = catchAsync(async(req,res,next)=>{
-    const data= await Company.find();
+    const data= await Company.find({role:'company'});
     if(!data){
         return next(new AppError('No Data',404));
     }
     res.status(200).json({
         status:true,
+        length:data.length,
         data
     })
 })
@@ -133,7 +134,7 @@ exports.resetCompanyPassword=catchAsync(async(req,res,next)=>{
     company.passwordOtp = undefined;
     company.passwordOtpExpires = undefined;
 
-    await company.save({ validateBeforeSave: false });
+    await company.save({ validateBeforeSave: true });
     res.status(200).json({
         status:true,
         message:"Successfully reset Password"

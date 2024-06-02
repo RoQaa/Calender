@@ -4,20 +4,8 @@ const Task = require('../models/taskModel');
 const io = require('../utils/socket')
 const {catchAsync} = require('../utils/catchAsync');
 const AppError = require("../utils/appError");
-/*
-// Function to schedule a notification
-const scheduleNotification = (task) => {
 
-    const notificationTime = new Date(task.dueDate.getTime() + 2 * 60 * 1000); // 2 minutes after due date
-    console.log("notificationScheduleTime : ",notificationTime.toISOString())
-    schedule.scheduleJob(notificationTime, () => {
-        io.getIo().emit('notificationSchedule', `Task "${task.name}" is due in 10 minutes`);
-    });
-
-
-};
-
-*/
+//Company
 exports.createTask = catchAsync(async (req,res,next)=>{
     req.body.company=req.user.id;
 
@@ -88,5 +76,25 @@ exports.getAllTasks=catchAsync(async (req,res,next)=>{
         status:true,
         length:data.length,
         data
+    })
+})
+
+//Employee
+exports.getMyTasks=catchAsync(async(req,res,next)=>{
+    const tasks=await Task.find({employee:req.user.id}).sort('-priority')
+    if(!tasks||tasks.length===0) return next(new AppError(`No tasks found`,404))
+    res.status(200).json({
+        status:true,
+        length:tasks.length,
+        tasks
+    })
+})
+exports.getOneMyTask=catchAsync(async(req,res,next)=>{
+    const task=await Task.findOne({_id:req.params.id,employee:req.user.id})
+
+    if(!task) return next(new AppError(`No tasks found`,404))
+    res.status(200).json({
+        status:true,
+        task
     })
 })
