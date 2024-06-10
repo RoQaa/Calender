@@ -115,7 +115,7 @@ exports.updateMe=catchAsync(async(req,res,next)=>{
 
     res.status(200).json({
         status:true,
-        message:`Successfully updated Employee`,
+        message:`Successfully updated`,
        // employee
     })
 })
@@ -237,7 +237,7 @@ exports.deleteByCompanyOrAdmin=catchAsync(async (req,res,next)=>{
 
     res.status(200).json({
         status:true,
-        message:`Successfully deleted company`,
+        message:`Successfully deleted Employee`,
     })
 })
 exports.resetPasswordByCompanyOrAdmin=catchAsync(async (req,res,next)=>{

@@ -46,6 +46,7 @@ exports.updateKindTask=catchAsync(async (req,res,next)=>{
 
     res.status(200).json({
         status: true,
+        message:"Type Updated Successfully",
        data:doc
     });
 })
