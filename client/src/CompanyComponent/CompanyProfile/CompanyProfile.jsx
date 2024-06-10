@@ -60,42 +60,24 @@ export default function CompanyProfile({ setUserData }) {
         setUserData(null)
         toast.error(err?.response?.data?.message)
         setDeleteLoading(false)
-      } else {
+      } else if (err?.response?.status == 400) {
         toast.error(err?.response?.data?.message)
         setDeleteLoading(false)
       }
     }).then((res) => {
-
       console.log(res);
       console.log(res?.data);
-      if (res?.data?.status == false) {
-        setDeleteLoading(false)
-        setUpdatePassMood(false)
-        toast.error(res?.data?.message)
-      } else {
-        setDeleteLoading(false)
-        setUpdatePassMood(false)
+      if (res?.data?.status == true) {
         localStorage.clear()
         setUserData(null)
+        setDeleteLoading(false)
+        setUpdatePassMood(false)
         toast.success(res?.data?.message)
-
       }
 
 
     })
   }
-
-  // async function logOut() {
-  //   let token = localStorage.getItem('CompanyToken')
-  //   let headers = {
-  //     Authorization: `Bearer ${token}`
-  //   }
-  //   let { data } = await axios(`http://localhost:5000/api/company/logout`, { headers })
-  //   localStorage.clear()
-  //   setUserData(null)
-  //   console.log(data);
-  // }
-
   let validationSchema = Yup.object({
     currentPassword: Yup.string().required('currentPassword is required'),
     newPassword: Yup.string().required('newPassword is required'),

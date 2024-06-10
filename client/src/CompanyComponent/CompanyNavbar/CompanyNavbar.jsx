@@ -4,12 +4,13 @@ import axios from 'axios';
 
 export default function CompanyNavbar({ setUserData }) {
   const navigate = useNavigate()
-  let token = localStorage.getItem('CompanyToken')
-  let headers = {
-    // 'Content-Type': 'multipart/form-data',
-    Authorization: `Bearer ${token}`
-  }
+
   async function logOut() {
+    let token = localStorage.getItem('CompanyToken')
+    let headers = {
+      // 'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`
+    }
     let { data } = await axios(`http://localhost:5000/api/company/logout`, { headers })
     localStorage.clear()
     setUserData(null)

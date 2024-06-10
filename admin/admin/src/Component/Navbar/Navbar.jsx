@@ -1,12 +1,60 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom'
 //test
-export default function Navbar({ AdminData }) {
+export default function Navbar({ AdminData ,setAdminData}) {
   const [activeLink, setActiveLink] = useState(0);
+  const [AdminName, setAdminName] = useState({});
 
   const handleLinkClick = (index) => {
     setActiveLink(index);
   };
+
+  async function getAdminInfo() {
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setAdminData(null)
+        toast.error(err?.response?.data?.message)
+      } else {
+        toast.error(err?.response?.data?.message)
+      }
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data?.data);
+      setAdminName(res?.data?.data)
+    })
+  }
+
+  useEffect(() => {
+    if (localStorage.getItem('AdminToken') != null) {
+      getAdminInfo()
+    }
+  }, [])
+
+  const navigate = useNavigate()
+
+  async function logOut() {
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
+      // 'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`
+    }
+    let { data } = await axios(`http://localhost:5000/api/company/logout`, { headers })
+    localStorage.clear()
+    setAdminData(null)
+    navigate('/arc-admin/login')
+    console.log(data);
+  }
+
+
+
+
   return <>
     {AdminData ? <nav className="navbar navbar-expand-lg mainColor text-white text-center px-5 ">
       <div className="container-fluid  ">
@@ -26,9 +74,9 @@ export default function Navbar({ AdminData }) {
               <Link onClick={() => handleLinkClick(0)} className={activeLink === 0 ? 'nav-link active  text-white' : 'nav-link text-white'} aria-current="page" to='/arc-admin'>Company</Link>
             </li>
 
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link onClick={() => handleLinkClick(1)} className={activeLink === 1 ? 'nav-link active  text-white' : 'nav-link text-white'} to='createAccount'>Create Acount</Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link onClick={() => handleLinkClick(2)} className={activeLink === 2 ? 'nav-link active  text-white' : 'nav-link text-white'} to='addTaskType'>Add Task Type</Link>
             </li>
@@ -51,14 +99,14 @@ export default function Navbar({ AdminData }) {
 
                 <h5>
                   <img className='img-fluid rounded-circle col-2 me-2 shadow-lg p-2' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
-                  Mohamed</h5>
+                  {AdminName?.name}</h5>
 
 
 
               </div>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-white" to='login'>Logout</Link>
+              <Link className="nav-link text-white" onClick={() => { logOut() }}>Logout</Link>
             </li>
           </ul>
 

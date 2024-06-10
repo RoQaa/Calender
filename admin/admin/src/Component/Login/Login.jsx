@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { toast } from "react-hot-toast";
 
-export default function Login({ saveAdminData }) {
+export default function Login({ saveAdminData, setAdminInfo, AdminInfo }) {
   let navigate = useNavigate()
 
 
@@ -24,21 +24,23 @@ export default function Login({ saveAdminData }) {
     console.log(values);
     setloading(true)
     let { data } = await axios.post('http://localhost:5000/api/company/login', { email: values.email, password: values.password }).catch((err) => {
-      setmessageErr2(`${err.response.message}`)
+      setmessageErr2(`${err?.response?.message}`)
       setloading(false)
-      toast.error(err.response.data.message)
+      toast.error(err?.response?.data?.message)
     })
     console.log(data);
-    if (data.status == true && data.data.role == 'admin') {
-      localStorage.setItem('AdminToken', data.token)
+    if (data?.status == true && data?.data?.role == 'admin') {
+      localStorage.setItem('AdminToken', data?.token)
       saveAdminData()
+      console.log(data.data.name);
+      setAdminInfo(data.data.name)
+      console.log(AdminInfo);
       navigate('/arc-admin')
       setloading(false)
-      toast.success(data.message)
+      toast.success(data?.message)
     } else {
-      toast.success(data.message)
+      toast.success(data?.message)
       setloading(false)
-
     }
 
 
@@ -66,7 +68,7 @@ export default function Login({ saveAdminData }) {
         <form onSubmit={formik2.handleSubmit} className=' w-100 bg-light  p-5 rounded-3 shadow-lg  '>
           <h2 className="text-capitalize fw-bolder mainFont  text-center mb-5  " >welcome to calendar admin panel</h2>
 
-          {messageErr2 !== '' ? <div className='alert alert-danger'>{messageErr2}</div> : null}
+
 
 
           <input placeholder='Email' className='form-control mb-2' type="email" name='email' id='email' value={formik2.values.email} onChange={formik2.handleChange} onBlur={formik2.handleBlur} />
@@ -78,7 +80,7 @@ export default function Login({ saveAdminData }) {
 
 
           {loading ?
-            <button type='button' className='btn btn-outline-success w-100 my-2 '><i className='fa fa-spinner fa-spin'></i></button>
+            <button type='button' className='btn mainBtn w-100 my-2 '><i className='fa fa-spinner fa-spin'></i></button>
             : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn w-100  my-2 '>Login</button>
           }  </form>
       </div>

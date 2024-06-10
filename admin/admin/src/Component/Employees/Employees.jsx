@@ -1,61 +1,222 @@
+import axios from 'axios'
 import { useFormik } from 'formik'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export default function Employees() {
+    const { id } = useParams()
     const [UpdateMood, setUpdateMood] = useState(false)
     const [ResetPassMood, setResetPassMood] = useState(false)
+    const [Loading, setLoading] = useState(false)
+    const [CompanyLoading, setCompanyLoading] = useState(false)
+    const [resetLoading, setresetLoading] = useState(false)
+    const [UpdateLoading, setUpdateLoading] = useState(false)
+
+
+    const [Employes, setEmployes] = useState([])
+    const [Companie, setCompanie] = useState({})
+
+
+
+
+    async function getCompanieEmployes() {
+        setLoading(true)
+        let token = localStorage.getItem('AdminToken')
+        let headers = {
+            Authorization: `Bearer ${token}`
+        }
+        await axios(`http://localhost:5000/api/company/getEmployeesByAdmin/${id}`, { headers }).catch((err) => {
+            if (err?.response?.status == 401) {
+                localStorage.clear()
+                toast.error(err?.response?.data?.message)
+                setLoading(false)
+            } else {
+                toast.error(err?.response?.data?.message)
+                setLoading(false)
+            }
+        }).then((res) => {
+            console.log(res);
+            console.log(res?.data?.data);
+            setEmployes(res?.data?.data)
+            setLoading(false)
+        })
+    }
+
+    async function getCompanie() {
+        setCompanyLoading(true)
+        let token = localStorage.getItem('AdminToken')
+        let headers = {
+            Authorization: `Bearer ${token}`
+        }
+        await axios(`http://localhost:5000/api/company/getOneCompany/${id}`, { headers }).catch((err) => {
+            if (err?.response?.status == 401) {
+                localStorage.clear()
+                toast.error(err?.response?.data?.message)
+                setCompanyLoading(false)
+            } else {
+                toast.error(err?.response?.data?.message)
+                setCompanyLoading(false)
+            }
+        }).then((res) => {
+            console.log(res);
+            console.log(res?.data?.data);
+            setCompanie(res?.data?.data)
+            setCompanyLoading(false)
+        })
+    }
+
+
+
+    useEffect(() => {
+        console.log(id);
+        getCompanie()
+        getCompanieEmployes()
+    }, [])
+
+
 
 
 
 
     let validationSchema = Yup.object({
         name: Yup.string().required('name is required'),
-        role: Yup.string().required('role is required'),
-
+        NumberPhone: Yup.string().required('NumberPhone is required'),
+        email: Yup.string().required('email is required'),
     })
 
     let formik = useFormik({
         initialValues: {
-            user: {
-                _id: "",
-                name: "",
-                email: "",
-                role: "",
-            }
+            _id: "",
+            name: "",
+            email: "",
+            NumberPhone: ""
         }
-
         ,
         onSubmit: handleUpdate,
         validationSchema
     })
-    async function handleUpdate(values) {
 
+    async function handleUpdate(values) {
         console.log(values);
+        setUpdateLoading(true)
+        let token = localStorage.getItem('AdminToken')
+        let headers = {
+            Authorization: `Bearer ${token}`
+        }
+        await axios.patch(`http://localhost:5000/api/company/updateEmployeeByAdmin/${values._id}`, {
+            name: values.name,
+            about: values.about
+        }, { headers }).catch((err) => {
+            if (err?.response?.status == 401) {
+                localStorage.clear()
+                toast.error(err?.response?.data?.message)
+                setUpdateLoading(false)
+            } else {
+                toast.error(err?.response?.data?.message)
+                setUpdateLoading(false)
+            }
+        }).then((res) => {
+            console.log(res);
+            toast.success(res?.data?.message)
+            formik.resetForm()
+            getCompanieEmployes()
+            setUpdateLoading(false)
+            setUpdateMood(false)
+        })
+    }
+
+
+    function getUpdateData(index) {
+        const selectedEmploye = Employes[index]
+        formik.setValues({
+            _id: selectedEmploye._id,
+            name: selectedEmploye.name,
+            email: selectedEmploye.email,
+            NumberPhone: selectedEmploye.NumberPhone,
+        })
+        setUpdateMood(true)
     }
 
     let validationPassSchema = Yup.object({
         password: Yup.string().required('password is required'),
-        confirmPassword: Yup.string().required('confirmPassword is required'),
+        confirmPassword: Yup.string().required('confirmPassword is required').equals([Yup.ref('password')], 'you must be like a new password'),
 
 
     })
 
     let formik2 = useFormik({
         initialValues: {
-            newTask: {
-                password: "",
-                confirmPassword: ""
-            }
+            _id: "",
+            password: "",
+            confirmPassword: ""
         }
-
         ,
         onSubmit: handlePassUpdate,
-        validationPassSchema
+        validationSchema: validationPassSchema
     })
     async function handlePassUpdate(values) {
-
         console.log(values);
+        setresetLoading(true)
+        let token = localStorage.getItem('AdminToken')
+        let headers = {
+            Authorization: `Bearer ${token}`
+        }
+        await axios.patch(`http://localhost:5000/api/company/resetEmployeePasswordByAdmin/${values._id}`, {
+            password: values.password,
+            passwordConfirm: values.confirmPassword
+        }, { headers }).catch((err) => {
+            if (err?.response?.status == 401) {
+                console.log(err);
+
+                localStorage.clear()
+                toast.error(err?.response?.data?.message)
+                setresetLoading(false)
+            } else {
+                console.log(err);
+                toast.error(err?.response?.data?.message)
+                setresetLoading(false)
+            }
+        }).then((res) => {
+            console.log(res);
+            toast.success(res?.data?.message)
+            formik2.resetForm()
+            getCompanieEmployes()
+            setresetLoading(false)
+            setResetPassMood(false)
+
+        })
+    }
+
+    function getResetData(index) {
+        const selectedEmploye = Employes[index]
+        console.log(selectedEmploye);
+        formik2.setValues({
+            _id: selectedEmploye._id,
+        })
+        setResetPassMood(true)
+    }
+
+    async function deleteEmploye(_id) {
+        let token = localStorage.getItem('AdminToken')
+        let headers = {
+            Authorization: `Bearer ${token}`
+        }
+        await axios.delete(`http://localhost:5000/api/company/deleteEmployeeByAdmin/${_id}`, { headers }).catch((err) => {
+            if (err?.response?.status == 401) {
+                console.log(err);
+                localStorage.clear()
+                toast.error(err?.response?.data?.message)
+            } else {
+                console.log(err);
+                toast.error(err?.response?.data?.message)
+            }
+        }).then((res) => {
+            console.log(res);
+            toast.success(res?.data?.message)
+            getCompanieEmployes()
+        })
     }
 
     return <>
@@ -74,26 +235,16 @@ export default function Employees() {
                         <input disabled className='form-control' type="text" name='email' id='email' value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur} />
                         {formik.errors.email && formik.touched.email ? <div className='form-text text-danger'>{formik.errors.email}</div> : null}
 
-
-                        <label for="role" className="form-label mt-2 fw-bold">Role</label>
-
-                        <select className="form-select mainFont" aria-label="Default select example" name='role' id='role' value={formik.values.role} onChange={formik.handleChange} onBlur={formik.handleBlur}>
-
-                            <option disabled selected>select role</option>
-
-                            <option >Admin</option>
-                            <option >Manger</option>
-                            <option >User</option>
-
-
-
-                        </select>
+                        <label for="NumberPhone" className="form-label fw-bold">Phone Number</label>
+                        <input disabled className='form-control' type="text" name='tel' id='NumberPhone' value={formik.values.NumberPhone} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                        {formik.errors.NumberPhone && formik.touched.NumberPhone ? <div className='form-text text-danger'>{formik.errors.NumberPhone}</div> : null}
 
 
 
                         <div className='row my-2 g-3'>
-                            <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
-
+                            {UpdateLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
+                                : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
+                            }
                             <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
 
                         </div>
@@ -118,8 +269,9 @@ export default function Employees() {
 
 
                         <div className='row my-2 g-3'>
-                            <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
-
+                            {resetLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
+                                : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
+                            }
                             <button onClick={() => { setResetPassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
 
                         </div>
@@ -132,95 +284,70 @@ export default function Employees() {
         <div className="container pt-5">
             <h2 className='text-center mainFont h1'>Company data</h2>
             <div className='w-75 mx-auto row align-items-center justify-content-around '>
-                <div className='col-md-4'>
-                    <div className=''>
-                        <img className='img-fluid rounded-circle shadow-lg p-1 ' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
+                {CompanyLoading ? <div className='col-12 text-center my-5 py-5'>
+                    <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
+                </div> : <>
+                    <div className='col-md-4'>
+                        <div className=''>
+                            <img className='img-fluid rounded-circle shadow-lg p-1 ' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
+                        </div>
                     </div>
-                </div>
-                <div className='col-md-7'>
-                    <div className=''>
-                        <h5 className='fw-bold' >Company Name : </h5>
-                        <p className='ps-4 text-muted'>arcodex development company</p>
-                        <h5 className='fw-bold'>About : </h5>
-                        <p className='ps-4 text-muted'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum delectus dolor accusantium animi consectetur. Officia dicta laboriosam dolor accusamus eaque suscipit provident rerum delectus dolorum?</p>
-
+                    <div className='col-md-7'>
+                        <div className=''>
+                            <h5 className='fw-bold' >Company Name : </h5>
+                            <p className='ps-4 text-muted'>{Companie.name}</p>
+                            <h5 className='fw-bold'>About : </h5>
+                            <p className='ps-4 text-muted'>{Companie.about}</p>
+                        </div>
                     </div>
-                </div>
+                </>}
             </div>
             <h2 className='text-center mainFont h1'>Employees</h2>
 
             <div className=' p-5'>
-                <table class="table table-striped  table-hover mx-auto text-center ">
-                    <thead >
-                        <tr >
-                            <th scope="col" className='mainFont' >#</th>
-                            <th scope="col" className='mainFont'>Name</th>
-                            <th scope="col" className='mainFont'>Email</th>
-                            <th scope="col" className='mainFont'>Type</th>
-                            <th scope="col" className='mainFont'>Acthions</th>
+                {Loading ? <div className='col-12 text-center my-5 py-5'>
+                    <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
+                </div> : <>
+                    {Employes?.length == 0 ? <h3 className='text-center'>Don't have Employes</h3>:<table class="table table-striped  table-hover mx-auto text-center ">
+                        <thead >
+                            <tr >
+                                <th scope="col" className='mainFont' >#</th>
+                                <th scope="col" className='mainFont'>Name</th>
+                                <th scope="col" className='mainFont'>Email</th>
+                                <th scope="col" className='mainFont'>Phone</th>
+                                <th scope="col" className='mainFont'>Acthions</th>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className='align-baseline'>
-                            <th scope="row" className='mainFont'>1</th>
-                            <td className='mainFont'> Mark</td>
-                            <td className='mainFont'> Mark@gmail.com</td>
-                            <td className='mainFont '><div className='badge mainRole'>Admin</div> </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Employes.map((employe, index) => {
+                                return <tr className='align-baseline' key={employe._id}>
+                                    <th scope="row" className='mainFont'>{index + 1}</th>
+                                    <td className='mainFont'> {employe.name}</td>
+                                    <td className='mainFont'> {employe.email}</td>
+                                    <td className='mainFont '>{employe.NumberPhone}</td>
 
-                            <td>
-                                <div class="dropdown ">
-                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
-                                    </button>
-                                    <ul class="dropdown-menu ">
-                                        <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
-                                        <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
-                                        <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr className='align-baseline'>
-                            <th scope="row" className='mainFont'>1</th>
-                            <td className='mainFont'> Mark</td>
-                            <td className='mainFont'> Mark@gmail.com</td>
-                            <td className='mainFont '><div className='badge mainRole'>Admin</div> </td>
+                                    <td>
+                                        <div class="dropdown ">
+                                            <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa-solid fa-list fa-0 mainFont"></i>
+                                            </button>
+                                            <ul class="dropdown-menu ">
+                                                <li onClick={() => { deleteEmploye(employe._id) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                                                <li onClick={() => { getUpdateData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
+                                                <li onClick={() => { getResetData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
 
-                            <td>
-                                <div class="dropdown ">
-                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
-                                    </button>
-                                    <ul class="dropdown-menu ">
-                                        <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
-                                        <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
-                                        <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr className='align-baseline'>
-                            <th scope="row" className='mainFont'>1</th>
-                            <td className='mainFont'> Mark</td>
-                            <td className='mainFont'> Mark@gmail.com</td>
-                            <td className='mainFont '><div className='badge mainRole'>Admin</div> </td>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            })}
 
-                            <td>
-                                <div class="dropdown ">
-                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
-                                    </button>
-                                    <ul class="dropdown-menu ">
-                                        <li className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
-                                        <li onClick={() => { setUpdateMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
-                                        <li onClick={() => { setResetPassMood(true) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                        </tbody>
+                    </table>}
+
+                </>}
             </div>
         </div>
     </>

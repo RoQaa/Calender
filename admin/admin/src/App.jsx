@@ -19,49 +19,52 @@ import AddCompany from './Component/AddCompany/AddCompany.jsx';
 
 function App() {
   const [AdminData, setAdminData] = useState(null)
+  const [AdminInfo, setAdminInfo] = useState(null)
+
 
 
   function saveAdminData() {
     setAdminData(localStorage.getItem('AdminToken'))
   }
 
-  // async function getAdminInfo() {
-  //   let token = localStorage.getItem('AdminToken')
-  //   let headers = {
-  //     Authorization: `Bearer ${token}`
-  //   }
-  //   await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
-  //     if (err?.response?.status == 401) {
-  //       localStorage.clear()
-  //       setAdminData(null)
-  //       toast.error(err?.response?.data?.message)
-  //     } else {
-  //       toast.error(err?.response?.data?.message)
-  //     }
-  //   }).then((res) => {
-  //     console.log(res);
-  //     console.log(res.data.data);
-  //   })
-  // }
+  async function getAdminInfo() {
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setAdminData(null)
+        toast.error(err?.response?.data?.message)
+      } else {
+        toast.error(err?.response?.data?.message)
+      }
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data?.data);
+      setAdminInfo(res?.data?.data)
+    })
+  }
 
-  // useEffect(() => {
-  //   if (localStorage.getItem('AdminToken') != null) {
-  //     saveAdminData()
-  //     getAdminInfo()
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (localStorage.getItem('AdminToken') != null) {
+      saveAdminData()
+      getAdminInfo()
+    }
+  }, [])
 
   let routes = createBrowserRouter([
     {
-      path: 'arc-admin', element: <Layout AdminData={AdminData} saveAdminData={saveAdminData} />, children: [
+      path: 'arc-admin', element: <Layout setAdminData={setAdminData} setAdminInfo={setAdminInfo} AdminData={AdminData} saveAdminData={saveAdminData} AdminInfo={AdminInfo} />, children: [
         { index: true, element: <ProtactecdAdminRoute><Users /></ProtactecdAdminRoute> },
         { path: 'addTaskType', element: <ProtactecdAdminRoute> <AddTaskType /></ProtactecdAdminRoute> },
-        { path: 'createAccount', element: <ProtactecdAdminRoute> <CreateAccount /></ProtactecdAdminRoute> },
+        // { path: 'createAccount', element: <ProtactecdAdminRoute> <CreateAccount /></ProtactecdAdminRoute> },
         { path: 'addCompany', element: <ProtactecdAdminRoute> <AddCompany /> </ProtactecdAdminRoute> },
-        { path: 'profile', element: <ProtactecdAdminRoute> <Profile /> </ProtactecdAdminRoute> },
+        { path: 'profile', element: <ProtactecdAdminRoute> <Profile setAdminData={setAdminData} /> </ProtactecdAdminRoute> },
         { path: 'sendNotifications', element: <ProtactecdAdminRoute> <SendNotifications /></ProtactecdAdminRoute> },
-        { path: 'employees', element: <ProtactecdAdminRoute> <Employees /></ProtactecdAdminRoute> },
-        { path: 'login', element: <Login saveAdminData={saveAdminData} /> },
+        { path: 'employees/:id', element: <ProtactecdAdminRoute> <Employees /></ProtactecdAdminRoute> },
+        { path: 'login', element: <Login AdminInfo={AdminInfo} saveAdminData={saveAdminData} setAdminInfo={setAdminInfo} /> },
         { path: '*', element: <ProtactecdAdminRoute> <NotFound /></ProtactecdAdminRoute> }
       ]
     },

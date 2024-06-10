@@ -52,6 +52,9 @@ export default function CompanyScren({ setUserData }) {
     async function getUserEmployes() {
         setEmployesLoading(true)
         let token = localStorage.getItem('CompanyToken')
+        if (token == null) {
+            token = "";
+        }
         let headers = {
             Authorization: `Bearer ${token}`
         }
@@ -62,7 +65,8 @@ export default function CompanyScren({ setUserData }) {
                 toast.error(err?.response?.data?.message)
                 setEmployesLoading(false)
             } else {
-                toast.error(err?.response?.data?.message)
+                // toast.error(err?.response?.data?.message)
+                // console.log(err?.response?.data?.message);
                 setEmployesLoading(false)
             }
         }).then((res) => {
@@ -82,15 +86,12 @@ export default function CompanyScren({ setUserData }) {
 
     }, [])
 
-
-
     let validationSchema = Yup.object({
         name: Yup.string().required('name is required'),
         email: Yup.string().required('email is required'),
         NumberPhone: Yup.string().required('NumberPhone is required'),
         isActive: Yup.string().required('isActive is required'),
     })
-
     let formik = useFormik({
         initialValues: {
             user: {
@@ -169,6 +170,7 @@ export default function CompanyScren({ setUserData }) {
         onSubmit: handlePassUpdate,
         validationSchema: validationPassSchema
     })
+    
     async function handlePassUpdate(values) {
 
         console.log(values);

@@ -39,7 +39,7 @@ export default function AddTask({ setUserData }) {
       console.log(res?.data?.data);
       setemployeeOptions(res?.data?.data?.map((employee) => ({
         value: employee._id,
-        label: employee.email, 
+        label: employee.email,
       })))
       console.log(employeeOptions);
       setEmployesLoading(false)
@@ -202,27 +202,27 @@ export default function AddTask({ setUserData }) {
 
         {EmployesLoading ? <div className='col-12 text-center my-5 py-5'>
           <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-        </div> : <> 
+        </div> : <>
 
-        <Select
-          id="employee"
-          name="employee"
-          options={employeeOptions}
-          isMulti
-          value={formik?.values?.employee?.map((employeeId) =>
-            employeeOptions.find((option) => option.value === employeeId)
-          )}
-          onChange={(selectedOptions) => {
-            formik.setFieldValue(
-              'employee',
-              selectedOptions ? selectedOptions?.map((option) => option.value) : []
-            );
-          }}
-          onBlur={formik.handleBlur}
-          className=""
-        />
-        
-          </>}
+          <Select
+            id="employee"
+            name="employee"
+            options={employeeOptions}
+            isMulti
+            value={formik?.values?.employee?.map((employeeId) =>
+              employeeOptions.find((option) => option.value === employeeId)
+            )}
+            onChange={(selectedOptions) => {
+              formik.setFieldValue(
+                'employee',
+                selectedOptions ? selectedOptions?.map((option) => option.value) : []
+              );
+            }}
+            onBlur={formik.handleBlur}
+            className=""
+          />
+
+        </>}
 
 
 
