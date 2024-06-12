@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
 import { toast } from "react-hot-toast";
 
-export default function AddEmploye({setUserData}) {
+export default function AddEmploye({ setUserData }) {
   const [Loading, setLoading] = useState(false)
   let navigate = useNavigate()
 

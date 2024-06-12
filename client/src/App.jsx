@@ -42,9 +42,6 @@ function App() {
     setUserData(localStorage.getItem('CompanyToken'))
   }
 
-  function saveAdminData() {
-    setAdminData(localStorage.getItem('AdminToken'))
-  }
 
   async function getUserInfo() {
     let token = localStorage.getItem('CompanyToken')
@@ -68,52 +65,18 @@ function App() {
     })
   }
 
-  async function getAdminInfo() {
-    let token = localStorage.getItem('AdminToken')
-    let headers = {
-      Authorization: `Bearer ${token}`
-    }
-    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
-      if (err?.response?.status == 401) {
-        localStorage.clear()
-        setUserData(null)
-        toast.error(err?.response?.data?.message)
-      } else {
-        toast.error(err?.response?.data?.message)
-      }
-    }).then((res) => {
-      console.log(res);
-      console.log(res.data.data);
-    })
-  }
 
   useEffect(() => {
     if (localStorage.getItem('CompanyToken') != null) {
       saveData()
       getUserInfo()
     }
-    if (localStorage.getItem('AdminToken') != null) {
-      saveAdminData()
-      getAdminInfo()
-    }
+    
   }, [])
 
 
 
   let routes = createBrowserRouter([
-    {
-      path: 'arc-admin', element: <Layout />, children: [
-        { index: true, element: <ProtactecdAdminRoute><Users /></ProtactecdAdminRoute> },
-        { path: 'addTaskType', element: <ProtactecdAdminRoute> <AddTaskType /></ProtactecdAdminRoute> },
-        { path: 'createAccount', element: <ProtactecdAdminRoute> <CreateAccount /></ProtactecdAdminRoute> },
-        { path: 'addCompany', element: <ProtactecdAdminRoute> <AddCompany /> </ProtactecdAdminRoute> },
-        { path: 'profile', element: <ProtactecdAdminRoute> <Profile /> </ProtactecdAdminRoute> },
-        { path: 'sendNotifications', element: <ProtactecdAdminRoute> <SendNotifications /></ProtactecdAdminRoute> },
-        { path: 'employees', element: <ProtactecdAdminRoute> <Employees /></ProtactecdAdminRoute> },
-        { path: 'login', element: <Login /> },
-        { path: '*', element: <ProtactecdAdminRoute> <NotFound /></ProtactecdAdminRoute> }
-      ]
-    },
     {
       path: '', element: <CompanyLayout setUserData={setUserData} />,
       children: [

@@ -6,72 +6,151 @@ import { Formik, Form, Field, ErrorMessage, useFormik } from 'formik';
 import { toast } from "react-hot-toast";
 
 
-export default function Profile() {
+export default function Profile({ setAdminData }) {
 
-  
+
   const [UpdatePasssMood, setUpdatePassMood] = useState(false)
   const [UpdateMood, setUpdateMood] = useState(false)
   const [Loading, setLoading] = useState(false)
+  const [AdminInfo, setAdminInfo] = useState({})
+  const [UpdateLoading, setUpdateLoading] = useState(false)
+  const [UpdatePassLoading, setUpdatePassLoading] = useState(false)
 
 
-  let token = localStorage.getItem('userToken')
-  let headers = {
+
+  async function getUserInfo() {
+    setLoading(true)
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
       Authorization: `Bearer ${token}`
+    }
+    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setAdminData(null)
+        toast.error(err?.response?.data?.message)
+        setLoading(false)
+      } else {
+        toast.error(err?.response?.data?.message)
+        setLoading(false)
+      }
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data?.data);
+      setAdminInfo(res?.data?.data)
+      setLoading(false)
+    })
   }
 
 
   useEffect(() => {
+    getUserInfo()
   }, [])
 
 
 
 
   async function handleUpdatePass(values) {
-     console.log(values);
-  }
+    console.log(values);
+    setUpdatePassLoading(true)
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    await axios.patch(`http://localhost:5000/api/company/updateMyPassword`, values, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setAdminData(null)
+        toast.error(err?.response?.data?.message)
+        setUpdatePassLoading(false)
+      } else if (err?.response?.status == 400) {
+        toast.error(err?.response?.data?.message)
+        setUpdatePassLoading(false)
+      }
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data);
+      if (res?.data?.status == true) {
+        localStorage.clear()
+        setAdminData(null)
+        setUpdatePassLoading(false)
+        setUpdatePassMood(false)
+        toast.success(res?.data?.message)
+      }
 
+
+    })
+  }
   let validationSchema = Yup.object({
-      currentPassword: Yup.string().required('currentPassword is required'),
-      newPassword: Yup.string().required('newPassword is required'),
-      newPasswordConfirm: Yup.string().required('newPasswordConfirm is required').equals([Yup.ref('newPassword')], 'you must be like a new password'),
+    currentPassword: Yup.string().required('currentPassword is required'),
+    newPassword: Yup.string().required('newPassword is required'),
+    newPasswordConfirm: Yup.string().required('newPasswordConfirm is required').equals([Yup.ref('newPassword')], 'you must be like a new password'),
   })
   let formik = useFormik({
-      initialValues: {
-          password: {
-              currentPassword: "",
-              newPassword: "",
-              newPasswordConfirm: ""
-          }
-      }
-      ,
-      onSubmit: handleUpdatePass,
-      validationSchema
+    initialValues: {
+      currentPassword: "",
+      newPassword: "",
+      newPasswordConfirm: ""
+    }
+    ,
+    onSubmit: handleUpdatePass,
+    validationSchema
   })
+
 
 
 
 
   async function handleUpdateData(values) {
-      console.log(values);
-
-  }
-
-  let validationDataSchema = Yup.object({
-      name: Yup.string().required('name is required'),
-      profileImage: Yup.mixed().required('profile Image is required'),
-
-  })
-  
-  let formik2 = useFormik({
-      initialValues: {
-          data: {
-              name: "",
-              profileImage: "",
-          }
+    console.log(values);
+    setUpdateLoading(true)
+    let token = localStorage.getItem('AdminToken')
+    let headers = {
+      Authorization: `Bearer ${token}`
+    }
+    let formData = new FormData()
+    if (values?.profileImage != "") {
+      formData.append('profileImage', values?.profileImage)
+    }
+    formData.append('name', values.name)
+    await axios.patch(`http://localhost:5000/api/company/updateMe`, formData, { headers }).catch((err) => {
+      if (err?.response?.status == 401) {
+        localStorage.clear()
+        setAdminData(null)
+        toast.error(err?.response?.data?.message)
+        setUpdateLoading(false)
+      } else {
+        toast.error(err?.response?.data?.message)
+        setUpdateLoading(false)
       }
-      ,
-      onSubmit: handleUpdateData,
-      validationDataSchema
+    }).then((res) => {
+      console.log(res);
+      console.log(res?.data);
+      getUserInfo()
+      setUpdateLoading(false)
+      setUpdateMood(false)
+
+    })
+  }
+  function handelCompanyDataForUpdated() {
+    formik2.setValues({
+      name: AdminInfo.name,
+      about: AdminInfo.about
+    })
+    setUpdateMood(true)
+  }
+  let validationDataSchema = Yup.object({
+    name: Yup.string().required('name is required'),
+    profileImage: Yup.mixed(),
+  })
+  let formik2 = useFormik({
+    initialValues: {
+      name: "",
+      profileImage: ""
+    }
+    ,
+    onSubmit: handleUpdateData,
+    validationSchema: validationDataSchema
   })
 
 
@@ -98,12 +177,12 @@ export default function Profile() {
 
 
 
-          <div className='row my-2 g-3'>
-            {Loading ?
-              <button type='button' className='btn btn-outline-success col-12  '><i className='fa fa-spinner fa-spin'></i></button>
-              : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn btn-outline-success col-12 '>save changes</button>
+          <div className='row my-2 g-3 px-2'>
+            {UpdateLoading ?
+              <button type='button' className='btn mainBtn2 rounded-5 col-12  '><i className='fa fa-spinner fa-spin'></i></button>
+              : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn2 rounded-5 col-12 '>save changes</button>
             }
-            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger  rounded-5 col-12 '>cancel</button>
 
           </div>
 
@@ -111,7 +190,7 @@ export default function Profile() {
       </div>
     </div> : null}
     {UpdatePasssMood ? <div className='start-0 end-0 top-0 bottom-0  bg-body-secondary bg-opacity-50 fixed-top row justify-content-center align-content-center'>
-      <div className="ol-xl-4 col-lg-6 col-md-8 col-10 formRes">
+      <div className="col-xl-4 col-lg-6 col-md-8 col-10 formRes">
         <form onSubmit={formik.handleSubmit} className='w-100 my-5 bg-light  p-5 rounded-3 shadow '>
 
           <label for="currentPassword" class="form-label">currentPassword</label>
@@ -129,11 +208,11 @@ export default function Profile() {
 
 
           <div className='row my-2 g-3'>
-            {Loading ?
-              <button type='button' className='btn btn-outline-success col-12  '><i className='fa fa-spinner fa-spin'></i></button>
-              : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn btn-outline-success col-12 '>save changes</button>
+            {UpdatePassLoading ?
+              <button type='button' className='btn mainBtn2 rounded-5 col-12  '><i className='fa fa-spinner fa-spin'></i></button>
+              : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn2 rounded-5 col-12 '>save changes</button>
             }
-            <button onClick={() => { setUpdatePassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+            <button onClick={() => { setUpdatePassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger rounded-5 col-12 '>cancel</button>
 
           </div>
 
@@ -146,14 +225,14 @@ export default function Profile() {
 
       <div className='col-12   mx-auto justify-content-evenly  p-5 rounded-5 mt-5 mainFont'>
         <div className="row profileRes">
-          <div  data-wow-duration="1s" data-wow-delay="0.5s" className='col-lg-4 profileRes1  mx-auto text-center  p-5 shadow-lg rounded-4 wow fadeIn'>
+          <div data-wow-duration="1s" data-wow-delay="0.5s" className='col-lg-4 profileRes1  mx-auto text-center  p-5 shadow-lg rounded-4 wow fadeIn'>
             <div className='col-9 mx-auto'>
 
               <img className='img-fluid rounded-circle shadow-lg ' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
             </div>
-            <h3 className='mt-3 fw-bolder text-capitalize'>Mohamed</h3>
-            <p>Admin</p>
-            <button onClick={() => { setUpdateMood(true) }}  className='btn mainBtn2 rounded-5 col-8 my-2'>Update Profile</button>
+            <h3 className='mt-3 fw-bolder text-capitalize'>{AdminInfo.name}</h3>
+            <p>{AdminInfo.role}</p>
+            <button onClick={() => { handelCompanyDataForUpdated() }} className='btn mainBtn2 rounded-5 col-8 my-2'>Update Profile</button>
 
           </div>
           <div className='col-lg-6 profileRes1  align-self-center  text-center mx-auto mt-4 mainFont '>
@@ -161,15 +240,15 @@ export default function Profile() {
               <tbody>
                 <tr className='align-baseline '>
                   <td className='mainFont'>Name</td>
-                  <td className='mainFont'>Mohamed ashraf</td>
+                  <td className='mainFont'>{AdminInfo.name}</td>
                 </tr>
                 <tr className='align-baseline'>
                   <td className='mainFont'>Email</td>
-                  <td className='mainFont'>mohamde@gmail.com</td>
+                  <td className='mainFont'>{AdminInfo.email}</td>
                 </tr>
                 <tr className='align-baseline'>
                   <td className='mainFont'>Role</td>
-                  <td className='mainFont'>Admin</td>
+                  <td className='mainFont'>{AdminInfo.role}</td>
                 </tr>
               </tbody>
             </table>
