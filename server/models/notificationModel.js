@@ -12,7 +12,7 @@ const notificationSchema=mongoose.Schema({
     },
     description:{
         type:String,
-        minLength:[4,"min desc is at least 4 characters long"],
+        minLength:[1,"min desc is at least 1 characters long"],
         required:[true,'Please enter description'],
     }
 })
