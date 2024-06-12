@@ -14,7 +14,7 @@ exports.createNotification = catchAsync(async (req, res, next) => {
     const note = await Notification.create(req.body);
 
     // Emit socket event
-    io.getIo().emit('Notification', { action: 'created', note: note });
+    io.getIo().emit('Notification', { action: 'created', note: note,admin:{name:req.user.name}});
 
     // Send response
     res.status(201).json({
