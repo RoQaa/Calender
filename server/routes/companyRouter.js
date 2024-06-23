@@ -16,6 +16,7 @@ router.use(authCompanyController.protect);
 router.post('/createEmployee',companyController.createEmployee);
 router.get('/logout',authCompanyController.logOut);
 router.get('/myProfile',companyController.myProfile);
+router.get('/getMyNotes',companyController.getMyNotes);
 router.patch('/updateMe',companyController.uploadUserPhoto,companyController.resizeCompanyPhoto,companyController.updateMe);
 router.patch('/resetPassword',authCompanyController.resetPassword)
 router.patch('/updateMyPassword',companyController.updateMyPassword)

@@ -187,7 +187,17 @@ exports.myProfile=catchAsync(async (req,res,next)=>{
     })
 
 })
-
+exports.getMyNotes=catchAsync(async(req,res,next)=>{
+    const notes= await Notification.find({to:req.user.id})
+    if(!notes||notes.length===0){
+      return next(new AppError(`No notes found`,404))
+    }
+    res.status(200).json({
+        status:true,
+        length:notes.length,
+        notes
+    })
+})
 exports.updateMe=catchAsync(async (req,res,next)=>{
     if (req.body.password || req.body.passwordConfirm) {
         return next(
