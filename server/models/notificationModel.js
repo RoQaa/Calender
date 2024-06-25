@@ -15,13 +15,15 @@ const notificationSchema=mongoose.Schema({
         minLength:[1,"min desc is at least 1 characters long"],
         required:[true,'Please enter description'],
     }
+},{
+    timestamps:true
 })
 
 notificationSchema.pre(/^find/,function (next){
     this.populate({
         path:'to',
         select:'email'
-    })
+    }).sort('-createdAt')
     next();
 })
 
