@@ -9,7 +9,7 @@ const {catchAsync}=require('../utils/catchAsync');
 const AppError=require('../utils/AppError');
 const authFactory = require("../utils/authFactory");
 
-//TODO: Test Admin Routes
+
 
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
@@ -74,7 +74,7 @@ exports.deleteCompanyByAdmin=catchAsync(async (req,res,next)=>{
     const companyId=req.params.id
     const company = await Company.findById(companyId);
 
-    fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {
+    fs.unlink(`${process.env.IMAGEPATH}${company.profileImage}`, (err) => {
         if(err){
             console.log("Error:delete image ")
         }
@@ -104,9 +104,9 @@ exports.updateCompanyByAdmin=catchAsync(async (req,res,next)=>{
 
 
     if (req.file) {
-        fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {});
+        fs.unlink(`${process.env.IMAGEPATH}${company.profileImage}`, (err) => {});
 
-        filteredBody.profileImage = req.file.filename;
+        filteredBody.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`;
     }
     Object.assign(company, filteredBody); // Assuming `updateData` contains fields to update
     await company.save({ validateBeforeSave: false });
@@ -162,7 +162,7 @@ exports.createEmployee=  catchAsync(async (req, res, next) => {
             .toFormat('jpeg')
             .jpeg({ quality: 90 })
             .toFile(`public\\img\\users\\${req.file.filename}`);
-        employee.profileImage = `${req.file.filename}`;
+        employee.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`;
     }
 
     await employee.save();
@@ -213,9 +213,9 @@ exports.updateMe=catchAsync(async (req,res,next)=>{
 
 
     if (req.file) {
-        fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {});
+        fs.unlink(`${process.env.IMAGEPATH}${company.profileImage}`, (err) => {});
 
-        filteredBody.profileImage = req.file.filename;
+        filteredBody.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`
     }
     Object.assign(company, filteredBody); // Assuming `updateData` contains fields to update
     await company.save({ validateBeforeSave: false });
@@ -230,7 +230,7 @@ exports.deleteMe=catchAsync(async (req,res,next)=>{
     const companyId=req.user.id
     const company = await Company.findById(companyId);
 
-    fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${company.profileImage}`, (err) => {
+    fs.unlink(`${process.env.IMAGEPATH}${company.profileImage}`, (err) => {
         if(err){
             console.log("Error:delete image ")
         }

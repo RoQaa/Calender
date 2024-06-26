@@ -102,13 +102,13 @@ exports.updateMe=catchAsync(async(req,res,next)=>{
 
 
     if (req.file) {
-        fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${employee.profileImage}`, (err) => {
+        fs.unlink(`${process.env.IMAGEPATH}${employee.profileImage}`, (err) => {
             if(err){
                 console.log("File from update me in emp controller error")
             }
         });
 
-        filteredBody.profileImage = req.file.filename;
+        filteredBody.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`;
     }
     Object.assign(employee, filteredBody); // Assuming `updateData` contains fields to update
     await employee.save({ validateBeforeSave: false });
@@ -123,7 +123,7 @@ exports.deleteMe=catchAsync(async (req,res,next)=>{
     const employeeId=req.user.id
     const emp = await Employee.findById(employeeId);
 
-    fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${emp.profileImage}`, (err) => {});
+    fs.unlink(`${process.env.IMAGEPATH}${emp.profileImage}`, (err) => {});
     const empTasks=await Task.find({employee:employeeId})
     await Promise.all(
         empTasks.map(async (task) => {
@@ -199,8 +199,8 @@ exports.updateByCompanyOrAdmin=catchAsync(async (req,res,next)=>{
 
 
     if (req.file) {
-        fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${employee.profileImage}`, (err) => {});
-        filteredBody.profileImage = req.file.filename;
+        fs.unlink(`${process.env.IMAGEPATH}${employee.profileImage}`, (err) => {});
+        filteredBody.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`;
     }
     Object.assign(employee, filteredBody); // Assuming `updateData` contains fields to update
     await employee.save({ validateBeforeSave: false });
@@ -220,7 +220,7 @@ exports.deleteByCompanyOrAdmin=catchAsync(async (req,res,next)=>{
             return next(new AppError(`that employee not belongs to you`, 400))
         }
     }
-    fs.unlink(`C:\\Users\\RoQa\\Desktop\\Work\\Calender\\server\\public\\img\\users\\${emp.profileImage}`, (err) => {});
+    fs.unlink(`${process.env.IMAGEPATH}${emp.profileImage}`, (err) => {});
 
     const empTasks=await Task.find({employee:employeeId})
     await Promise.all(

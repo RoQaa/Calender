@@ -98,7 +98,7 @@ exports.SignUp=Model=>
             .toFormat('jpeg')
             .jpeg({ quality: 90 })
             .toFile(`public\\img\\users\\${req.file.filename}`);
-          doc.profileImage = `public\\img\\users\\${req.file.filename}`;
+          doc.profileImage = `${process.env.IMAGEPATH}${req.file.filename}`;
         }
 
         await doc.save();

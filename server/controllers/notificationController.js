@@ -24,7 +24,7 @@ exports.createNotification = catchAsync(async (req, res, next) => {
 });
 exports.getNotifications=catchAsync(async(req,res,next)=>{
     const data =  await Notification.find()
-    if(!data) return next(new AppError(`No data`,404));
+    if(!data||data.length===0) return next(new AppError(`No data`,404));
     res.status(200).json({
         status:true,
         data
