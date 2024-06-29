@@ -51,7 +51,7 @@ export default function Tasks() {
             : null}
             
         <h2 className='text-center mainFont h1'>Task Types</h2>
-        <div className=' p-5'>
+        <div className=' p-5 table-responsive '>
             <table class="table table-striped  table-hover mx-auto text-center ">
                 <thead >
                     <tr >

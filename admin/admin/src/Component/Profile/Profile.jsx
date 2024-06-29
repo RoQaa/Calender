@@ -24,7 +24,7 @@ export default function Profile({ setAdminData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/company/myProfile`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setAdminData(null)
@@ -57,7 +57,7 @@ export default function Profile({ setAdminData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.patch(`http://localhost:5000/api/company/updateMyPassword`, values, { headers }).catch((err) => {
+    await axios.patch(`${process.env.REACT_APP_API}/company/updateMyPassword`, values, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setAdminData(null)
@@ -113,7 +113,7 @@ export default function Profile({ setAdminData }) {
       formData.append('profileImage', values?.profileImage)
     }
     formData.append('name', values.name)
-    await axios.patch(`http://localhost:5000/api/company/updateMe`, formData, { headers }).catch((err) => {
+    await axios.patch(`${process.env.REACT_APP_API}/company/updateMe`, formData, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setAdminData(null)
@@ -232,7 +232,7 @@ export default function Profile({ setAdminData }) {
             </div>
             <h3 className='mt-3 fw-bolder text-capitalize'>{AdminInfo.name}</h3>
             <p>{AdminInfo.role}</p>
-            <button onClick={() => { handelCompanyDataForUpdated() }} className='btn mainBtn2 rounded-5 col-8 my-2'>Update Profile</button>
+            <button onClick={() => { handelCompanyDataForUpdated() }} className='btn mainBtn2 rounded-5 col-md-8 my-2'>Update Profile</button>
 
           </div>
           <div className='col-lg-6 profileRes1  align-self-center  text-center mx-auto mt-4 mainFont '>
@@ -253,7 +253,7 @@ export default function Profile({ setAdminData }) {
               </tbody>
             </table>
             <div className="row justify-content-evenly ">
-              <button onClick={() => { setUpdatePassMood(true) }} className='btn mainBtn2 my-3 col-5 rounded-5'>Update Password</button>
+              <button onClick={() => { setUpdatePassMood(true) }} className='btn mainBtn2 my-3 col-md-5 rounded-5'>Update Password</button>
             </div>
           </div>
         </div>

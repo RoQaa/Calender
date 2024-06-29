@@ -25,7 +25,7 @@ export default function CompanyProfile({ setUserData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/company/myProfile`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -54,7 +54,7 @@ export default function CompanyProfile({ setUserData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.patch(`http://localhost:5000/api/company/updateMyPassword`, values, { headers }).catch((err) => {
+    await axios.patch(`${process.env.REACT_APP_API}/company/updateMyPassword`, values, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -94,9 +94,6 @@ export default function CompanyProfile({ setUserData }) {
     validationSchema
   })
 
-
-
-
   async function handleUpdateData(values) {
     console.log(values);
     setUpdateLoading(true)
@@ -111,7 +108,7 @@ export default function CompanyProfile({ setUserData }) {
     formData.append('name', values.name)
     formData.append('about', values.about)
     console.log(formData);
-    await axios.patch(`http://localhost:5000/api/company/updateMe`, formData, { headers }).catch((err) => {
+    await axios.patch(`${process.env.REACT_APP_API}/company/updateMe`, formData, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -239,7 +236,7 @@ export default function CompanyProfile({ setUserData }) {
         <div className="row profileRes">
           <div className='col-lg-8 profileRes1  mx-auto text-center  p-5 shadow-lg rounded-4 wow fadeIn'>
             <div className='col-9 mx-auto'>
-              <img className='img-fluid rounded-circle shadow-lg mainColor p-1' src={CompanyData.profileImage} alt="" />
+              <img className='img-fluid rounded-circle shadow-lg mainColor p-1' src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" alt="" />
             </div>
             <h3 className='fw-bolder text-capitalize mt-2'>{CompanyData.name}</h3>
             <p>{CompanyData.about}</p>

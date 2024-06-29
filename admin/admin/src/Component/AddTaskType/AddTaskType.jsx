@@ -20,7 +20,7 @@ export default function AddTaskType() {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/typeTask/getTaskType`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/typeTask/getTaskType`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         console.log(err);
         localStorage.clear()
@@ -52,7 +52,7 @@ export default function AddTaskType() {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.post(`http://localhost:5000/api/typeTask/createTaskType`, { name: values.task }, { headers }).catch((err) => {
+    await axios.post(`${process.env.REACT_APP_API}/typeTask/createTaskType`, { name: values.task }, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         console.log(err);
         localStorage.clear()
@@ -108,7 +108,7 @@ export default function AddTaskType() {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.patch(`http://localhost:5000/api/typeTask/updateTaskType/${values._id}`, { name: values.name }, { headers }).catch((err) => {
+    await axios.patch(`${process.env.REACT_APP_API}/typeTask/updateTaskType/${values._id}`, { name: values.name }, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         console.log(err);
         localStorage.clear()
@@ -143,7 +143,7 @@ export default function AddTaskType() {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.delete(`http://localhost:5000/api/typeTask/deleteTaskType/${_id}`, { headers }).catch((err) => {
+    await axios.delete(`${process.env.REACT_APP_API}/typeTask/deleteTaskType/${_id}`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         console.log(err);
         localStorage.clear()
@@ -215,7 +215,7 @@ export default function AddTaskType() {
 
         {GetLoading ? <div className='col-12 text-center my-5 py-5'>
           <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-        </div> :
+        </div> :<div className='table-responsive '>
           <table class="table table-striped  table-hover mx-auto text-center ">
             <thead >
               <tr >
@@ -248,6 +248,7 @@ export default function AddTaskType() {
 
             </tbody>
           </table>
+          </div>
         }
       </div>
 

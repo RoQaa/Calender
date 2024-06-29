@@ -102,13 +102,16 @@
 }
 
 
-.tableCss {
-  overflow-x: auto !important;
+.table-responsive {
+  overflow-x: auto;
 }
 
-.dropdown-menu {
-  position: absolute !important;
+.table-responsive .dropdown-menu {
+  position: fixed !important;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
+
 
 /* .myTable{
   width: 100% !important;

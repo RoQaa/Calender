@@ -32,7 +32,7 @@ function App() {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/company/myProfile`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/company/myProfile`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setAdminData(null)
@@ -62,7 +62,7 @@ function App() {
         // { path: 'createAccount', element: <ProtactecdAdminRoute> <CreateAccount /></ProtactecdAdminRoute> },
         { path: 'addCompany', element: <ProtactecdAdminRoute> <AddCompany /> </ProtactecdAdminRoute> },
         { path: 'profile', element: <ProtactecdAdminRoute> <Profile setAdminData={setAdminData} /> </ProtactecdAdminRoute> },
-        { path: 'sendNotifications', element: <ProtactecdAdminRoute> <SendNotifications /></ProtactecdAdminRoute> },
+        { path: 'sendNotifications', element: <ProtactecdAdminRoute> <SendNotifications  setAdminData={setAdminData}/></ProtactecdAdminRoute> },
         { path: 'employees/:id', element: <ProtactecdAdminRoute> <Employees /></ProtactecdAdminRoute> },
         { path: 'login', element: <Login AdminInfo={AdminInfo} saveAdminData={saveAdminData} setAdminInfo={setAdminInfo} /> },
         { path: '*', element: <ProtactecdAdminRoute> <NotFound /></ProtactecdAdminRoute> }

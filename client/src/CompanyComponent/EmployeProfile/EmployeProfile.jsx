@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useFormik } from 'formik'
 import { useParams } from 'react-router-dom'
-import * as Yup from 'yup'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
 
 
-export default function EmployeProfile({setUserData}) {
+export default function EmployeProfile({ setUserData }) {
   const { id } = useParams()
   const [Loading, setLoading] = useState(false)
   const [CompanyEmploye, setCompanyEmploye] = useState({})
@@ -27,7 +25,7 @@ export default function EmployeProfile({setUserData}) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/company/getOneEmployee/${id}`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/company/getOneEmployee/${id}`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -51,7 +49,7 @@ export default function EmployeProfile({setUserData}) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/task/getEmployeeTasks/${id}`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/task/getEmployeeTasks/${id}`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -78,7 +76,7 @@ export default function EmployeProfile({setUserData}) {
     })
   }
 
- 
+
 
   useEffect(() => {
     console.log(id);
@@ -115,34 +113,40 @@ export default function EmployeProfile({setUserData}) {
           <h4 className='text-center mainFont pb-2'>Tasks</h4>
           {LoadingTasks ? <div className='col-12 text-center my-5 py-5'>
             <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-          </div> : <div className='table-responsive'><table class="table table-striped  table-hover mx-auto text-center mb-5">
-            <thead >
-              <tr >
-                <th scope="col" className='mainFont' >#</th>
-                <th scope="col" className='mainFont'>title</th>
-                <th scope="col" className='mainFont'>date</th>
-                <th scope="col" className='mainFont'>time</th>
-                <th scope="col" className='mainFont'>Tasktype</th>
-
-              </tr>
-            </thead>
-            <tbody>
-              {CompanyEmployeTasks.map((task, index) => {
-                return <tr className='align-baseline'>
-                  <th scope="row" className='mainFont'>{index + 1}</th>
-                  <td className='mainFont'>{task.name}</td>
-                  <td className='mainFont'>{CompanyEmployeTasksTime[index].date}</td>
-                  <td className='mainFont'>{CompanyEmployeTasksTime[index].time}</td>
-                  <td className='mainFont'>{task.kind.name}</td>
+          </div> : <div className='table-responsive'>
+            {CompanyEmployeTasks?.length != 0 ? <table class="table table-striped  table-hover mx-auto text-center mb-5">
+              <thead >
+                <tr >
+                  <th scope="col" className='mainFont' >#</th>
+                  <th scope="col" className='mainFont'>title</th>
+                  <th scope="col" className='mainFont'>date</th>
+                  <th scope="col" className='mainFont'>time</th>
+                  <th scope="col" className='mainFont'>Tasktype</th>
 
                 </tr>
-              })}
+              </thead>
+              <tbody>
+                {CompanyEmployeTasks.map((task, index) => {
+                  return <tr className='align-baseline'>
+                    <th scope="row" className='mainFont'>{index + 1}</th>
+                    <td className='mainFont'>{task.name}</td>
+                    <td className='mainFont'>{CompanyEmployeTasksTime[index].date}</td>
+                    <td className='mainFont'>{CompanyEmployeTasksTime[index].time}</td>
+                    <td className='mainFont'>{task.kind.name}</td>
+
+                  </tr>
+                })}
 
 
 
 
-            </tbody>
-          </table></div>}
+              </tbody>
+            </table> : <>
+              <div className='col-12 text-center my-5 py-5'>
+                <h3 className='mainFont'>Don't have tasks</h3>
+              </div>
+            </>}
+          </div>}
 
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function Login({ saveAdminData, setAdminInfo, AdminInfo }) {
   async function handleLoginData(values) {
     console.log(values);
     setloading(true)
-    let { data } = await axios.post('http://localhost:5000/api/company/login', { email: values.email, password: values.password }).catch((err) => {
+    let { data } = await axios.post(`${process.env.REACT_APP_API}/company/login`, { email: values.email, password: values.password }).catch((err) => {
       setmessageErr2(`${err?.response?.message}`)
       setloading(false)
       toast.error(err?.response?.data?.message)

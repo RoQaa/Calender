@@ -23,7 +23,7 @@ export default function AddTask({ setUserData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios(`http://localhost:5000/api/company/getEmployees`, { headers }).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/company/getEmployees`, { headers }).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -48,7 +48,7 @@ export default function AddTask({ setUserData }) {
     })
   }
   async function getTaskTypes() {
-    await axios(`http://localhost:5000/api/typeTask/getTaskType`).catch((err) => {
+    await axios(`${process.env.REACT_APP_API}/typeTask/getTaskType`).catch((err) => {
       if (err?.response?.status == 401) {
         localStorage.clear()
         setUserData(null)
@@ -82,7 +82,7 @@ export default function AddTask({ setUserData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.post(`http://localhost:5000/api/task/createTask`, {
+    await axios.post(`${process.env.REACT_APP_API}/task/createTask`, {
       name: values.name,
       description: values.description,
       dueDate: NewDate,
@@ -225,20 +225,9 @@ export default function AddTask({ setUserData }) {
         </>}
 
 
-
-
-        {/* <select  class="form-select" aria-label="Default select example" name='employee' id='employee' multiple value={formik.values.employee} onChange={formik.handleChange} onBlur={formik.handleBlur}>
-          <option disabled selected>select Employe</option>
-
-          {CompanyEmployes.map((employe) => {
-            return <option value={employe._id}>{employe.email}</option>
-          })}
-
-        </select> */}
-
         <div className='row my-2 g-3'>
           {Loading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
-            : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn  mainBtn col-12 '>Add</button>
+            : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn  mainBtn col-12 rounded-pill '>Add</button>
           }
         </div>
       </form>

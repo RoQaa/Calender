@@ -2,10 +2,10 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import CompanyNavbar from '../CompanyNavbar/CompanyNavbar.jsx'
 
-export default function CompanyLayout({ setUserData }) {
+export default function CompanyLayout({setnewNot, newNot, setUserData, Nots }) {
     return <>
         <div className='min-vh-100'>
-            <CompanyNavbar setUserData={setUserData}  />
+            <CompanyNavbar setnewNot={setnewNot} newNot={newNot} setUserData={setUserData} Nots={Nots} />
             <Outlet></Outlet>
         </div>
     </>

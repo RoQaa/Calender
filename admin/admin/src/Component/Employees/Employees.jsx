@@ -27,7 +27,7 @@ export default function Employees() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios(`http://localhost:5000/api/company/getEmployeesByAdmin/${id}`, { headers }).catch((err) => {
+        await axios(`${process.env.REACT_APP_API}/company/getEmployeesByAdmin/${id}`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 localStorage.clear()
                 toast.error(err?.response?.data?.message)
@@ -50,7 +50,7 @@ export default function Employees() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios(`http://localhost:5000/api/company/getOneCompany/${id}`, { headers }).catch((err) => {
+        await axios(`${process.env.REACT_APP_API}/company/getOneCompany/${id}`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 localStorage.clear()
                 toast.error(err?.response?.data?.message)
@@ -105,7 +105,7 @@ export default function Employees() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.patch(`http://localhost:5000/api/company/updateEmployeeByAdmin/${values._id}`, {
+        await axios.patch(`${process.env.REACT_APP_API}/company/updateEmployeeByAdmin/${values._id}`, {
             name: values.name,
             about: values.about
         }, { headers }).catch((err) => {
@@ -163,7 +163,7 @@ export default function Employees() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.patch(`http://localhost:5000/api/company/resetEmployeePasswordByAdmin/${values._id}`, {
+        await axios.patch(`${process.env.REACT_APP_API}/company/resetEmployeePasswordByAdmin/${values._id}`, {
             password: values.password,
             passwordConfirm: values.confirmPassword
         }, { headers }).catch((err) => {
@@ -203,7 +203,7 @@ export default function Employees() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.delete(`http://localhost:5000/api/company/deleteEmployeeByAdmin/${_id}`, { headers }).catch((err) => {
+        await axios.delete(`${process.env.REACT_APP_API}/company/deleteEmployeeByAdmin/${_id}`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 console.log(err);
                 localStorage.clear()
@@ -243,9 +243,9 @@ export default function Employees() {
 
                         <div className='row my-2 g-3'>
                             {UpdateLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
-                                : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
+                                : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn rounded-pill  col-12 '>save changes</button>
                             }
-                            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+                            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger rounded-pill col-12 '>cancel</button>
 
                         </div>
 
@@ -270,9 +270,9 @@ export default function Employees() {
 
                         <div className='row my-2 g-3'>
                             {resetLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
-                                : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn  col-12 '>save changes</button>
+                                : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn rounded-pill  col-12 '>save changes</button>
                             }
-                            <button onClick={() => { setResetPassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+                            <button onClick={() => { setResetPassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger rounded-pill col-12 '>cancel</button>
 
                         </div>
 
@@ -294,10 +294,9 @@ export default function Employees() {
                     </div>
                     <div className='col-md-7'>
                         <div className=''>
-                            <h5 className='fw-bold' >Company Name : </h5>
-                            <p className='ps-4 text-muted'>{Companie.name}</p>
-                            <h5 className='fw-bold'>About : </h5>
-                            <p className='ps-4 text-muted'>{Companie.about}</p>
+                            <h5 className='fw-bold' >Company Name : <span className='text-muted'>{Companie?.name}</span> </h5>
+
+                            <h5 className='fw-bold'>About : <span className='text-muted'>{Companie?.about}</span></h5>
                         </div>
                     </div>
                 </>}
@@ -308,44 +307,50 @@ export default function Employees() {
                 {Loading ? <div className='col-12 text-center my-5 py-5'>
                     <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
                 </div> : <>
-                    {Employes?.length == 0 ? <h3 className='text-center'>Don't have Employes</h3>:<table class="table table-striped  table-hover mx-auto text-center ">
-                        <thead >
-                            <tr >
-                                <th scope="col" className='mainFont' >#</th>
-                                <th scope="col" className='mainFont'>Name</th>
-                                <th scope="col" className='mainFont'>Email</th>
-                                <th scope="col" className='mainFont'>Phone</th>
-                                <th scope="col" className='mainFont'>Acthions</th>
+                    {Employes?.length == 0 ? <h3 className='text-center'>Don't have Employes</h3> : <>
+                        <div className='table-responsive ' >
+                            <table class="table table-striped  table-hover mx-auto text-center ">
+                                <thead >
+                                    <tr >
+                                        <th scope="col" className='mainFont' >#</th>
+                                        <th scope="col" className='mainFont'>Name</th>
+                                        <th scope="col" className='mainFont'>Email</th>
+                                        <th scope="col" className='mainFont'>Phone</th>
+                                        <th scope="col" className='mainFont'>Acthions</th>
 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Employes.map((employe, index) => {
-                                return <tr className='align-baseline' key={employe._id}>
-                                    <th scope="row" className='mainFont'>{index + 1}</th>
-                                    <td className='mainFont'> {employe.name}</td>
-                                    <td className='mainFont'> {employe.email}</td>
-                                    <td className='mainFont '>{employe.NumberPhone}</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Employes.map((employe, index) => {
+                                        return <tr className='align-baseline' key={employe._id}>
+                                            <th scope="row" className='mainFont'>{index + 1}</th>
+                                            <td className='mainFont'> {employe.name}</td>
+                                            <td className='mainFont'> {employe.email}</td>
+                                            <td className='mainFont '>{employe.NumberPhone}</td>
 
-                                    <td>
-                                        <div class="dropdown ">
-                                            <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-list fa-0 mainFont"></i>
-                                            </button>
-                                            <ul class="dropdown-menu ">
-                                                <li onClick={() => { deleteEmploye(employe._id) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
-                                                <li onClick={() => { getUpdateData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
-                                                <li onClick={() => { getResetData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
+                                            <td>
+                                                <div class="dropdown ">
+                                                    <button class="btn mainIcon  " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fa-solid fa-list fa-0 mainFont"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu ">
+                                                        <li onClick={() => { deleteEmploye(employe._id) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-trash-can me-2"></i>delete</li>
+                                                        <li onClick={() => { getUpdateData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-regular fa-pen-to-square me-2"></i>update</li>
+                                                        <li onClick={() => { getResetData(index) }} className="dropdown-item mainFont mainClick"><i class="fa-solid fa-rotate me-2"></i>reset Password</li>
 
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            })}
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    })}
 
 
-                        </tbody>
-                    </table>}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </>
+                    }
 
                 </>}
             </div>

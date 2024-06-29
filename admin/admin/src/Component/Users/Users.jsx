@@ -23,7 +23,7 @@ export default function Users() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios(`http://localhost:5000/api/company/getCompanies`, { headers }).catch((err) => {
+        await axios(`${process.env.REACT_APP_API}/company/getCompanies`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 localStorage.clear()
                 toast.error(err?.response?.data?.message)
@@ -74,7 +74,7 @@ export default function Users() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.post(`http://localhost:5000/api/company/createCompany`, values, { headers }).catch((err) => {
+        await axios.post(`${process.env.REACT_APP_API}/company/createCompany`, values, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 localStorage.clear()
                 toast.error(err?.response?.data?.message)
@@ -122,7 +122,7 @@ export default function Users() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.patch(`http://localhost:5000/api/company/updateByAdmin/${values._id}`, {
+        await axios.patch(`${process.env.REACT_APP_API}/company/updateByAdmin/${values._id}`, {
             name: values.name,
             about: values.about
         }, { headers }).catch((err) => {
@@ -181,7 +181,7 @@ export default function Users() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.patch(`http://localhost:5000/api/company/resetCompanyPassword/${values._id}`, {
+        await axios.patch(`${process.env.REACT_APP_API}/company/resetCompanyPassword/${values._id}`, {
             password: values.password,
             passwordConfirm: values.confirmPassword
         }, { headers }).catch((err) => {
@@ -220,7 +220,7 @@ export default function Users() {
         let headers = {
             Authorization: `Bearer ${token}`
         }
-        await axios.delete(`http://localhost:5000/api/company/deleteByAdmin/${_id}`, { headers }).catch((err) => {
+        await axios.delete(`${process.env.REACT_APP_API}/company/deleteByAdmin/${_id}`, { headers }).catch((err) => {
             if (err?.response?.status == 401) {
                 console.log(err);
                 localStorage.clear()
@@ -267,7 +267,7 @@ export default function Users() {
                         <div className='row my-2 g-3'>
                             {UpdateLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
                                 : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn mainBtn  col-12 rounded-pill'>save changes</button>}
-                            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+                            <button onClick={() => { setUpdateMood(false) }} type='reset' className='btn mx-auto rounded-pill btn-outline-danger col-12 '>cancel</button>
 
                         </div>
 
@@ -293,7 +293,7 @@ export default function Users() {
                         <div className='row my-2 g-3'>
                             {resetLoading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
                                 : <button disabled={!(formik2.isValid && formik2.dirty)} type='submit' className='btn mainBtn  col-12 rounded-pill'>save changes</button>}
-                            <button onClick={() => { setResetPassMood(false) }} type='reset' className='btn mx-auto btn-outline-danger col-12 '>cancel</button>
+                            <button onClick={() => { setResetPassMood(false) }} type='reset' className='btn mx-auto rounded-pill btn-outline-danger col-12 '>cancel</button>
 
                         </div>
 
@@ -351,7 +351,9 @@ export default function Users() {
 
                 {Loading ? <div className='col-12 text-center my-5 py-5'>
                     <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
-                </div> : <table class="table table-striped  table-hover mx-auto text-center ">
+                </div> : <>
+                <div className='table-responsive '>
+                <table class="table table-striped  table-hover mx-auto text-center ">
                     <thead >
                         <tr>
                             <th scope="col" className='mainFont' >#</th>
@@ -394,7 +396,9 @@ export default function Users() {
 
 
                     </tbody>
-                </table>}
+                </table>
+                </div>
+                </>}
 
 
             </div>

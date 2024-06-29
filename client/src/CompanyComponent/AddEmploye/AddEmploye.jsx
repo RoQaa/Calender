@@ -41,7 +41,7 @@ export default function AddEmploye({ setUserData }) {
     let headers = {
       Authorization: `Bearer ${token}`
     }
-    await axios.post(`http://localhost:5000/api/company/createEmployee`, {
+    await axios.post(`${process.env.REACT_APP_API}/company/createEmployee`, {
       name: values.name,
       password: values.password,
       passwordConfirm: values.passwordConfirm,
@@ -106,7 +106,7 @@ export default function AddEmploye({ setUserData }) {
 
         <div className='row my-2 g-3'>
           {Loading ? <button type='button' className='btn mainBtn col-12 rounded-pill  '><i className='fa fa-spinner fa-spin'></i></button>
-            : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn  mainBtn col-12 '>Add</button>
+            : <button disabled={!(formik.isValid && formik.dirty)} type='submit' className='btn  mainBtn col-12 rounded-pill'>Add</button>
           }
 
 

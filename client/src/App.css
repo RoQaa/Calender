@@ -31,26 +31,29 @@
 .mainColor {
   background-color: rgba(2, 103, 175, 255);
 }
-.active{
+
+.active {
   color: yellow !important;
   font-weight: bolder;
 }
 
-.nav-link:hover{
+.nav-link:hover {
   color: yellow !important;
 }
+
 .mainBtn {
   background-color: white;
   color: rgba(2, 103, 175, 255);
   border-color: rgba(2, 103, 175, 255);
-  
+
 }
+
 .mainBtn:hover {
   background-color: rgba(2, 103, 175, 255);
   color: white;
 }
 
-.mainClick{
+.mainClick {
   cursor: pointer;
 }
 
@@ -59,17 +62,19 @@
   background-color: rgba(2, 103, 175, 255);
   color: white;
 }
+
 .mainBtn2:hover {
   background-color: white;
   color: rgba(2, 103, 175, 255);
   border-color: rgba(2, 103, 175, 255);
-  
+
 }
 
 .mainFont {
   color: rgba(2, 103, 175, 255) !important;
 }
-.btn:disabled{
+
+.btn:disabled {
   border-color: rgba(2, 103, 175, 255) !important;
   color: rgba(2, 103, 175, 255) !important;
 
@@ -91,25 +96,73 @@
 .bg-custom-1 {
   background-color: #85144b;
 }
+
 .bg-custom-2 {
   background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
 }
-.backGroundCompany{
+
+.backGroundCompany {
   background-image: url('/src/images/pexels-heyho-6794920.jpg');
   background-size: cover;
 }
 
-.tableCss{
+.tableCss {
+  overflow-y: unset !important;
   overflow-x: auto !important;
 }
-.dropdown-menu{
-  position:absolute !important;
+
+
+.dropdown-menu {
+  position: absolute !important;
 }
 
 /* .myTable{
   width: 100% !important;
   margin: 0px !important;
   overflow: auto !important;
+} */
+.toast-wrap {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.dropdown-menu2 {
+  width: 25rem !important;
+  max-height: 14.5rem !important;
+  overflow-y: scroll;
+  /* scrollbar-width: thin;
+  scrollbar-color: rgba(2, 103, 175, 255) #f1f1f1; */
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table-responsive .dropdown-menu {
+  position: fixed !important;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+
+
+
+/* WebKit browsers
+.dropdown-menu::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #555;
 } */
 
 @keyframes App-logo-spin {
@@ -121,6 +174,17 @@
     transform: rotate(360deg);
   }
 }
-body, html {
+
+body,
+html {
   overflow: auto !important;
+}
+
+@media (max-width: 600px) {
+
+  .dropdown-menu2 {
+    width: 20rem !important;
+  }
+
+  /* Add more styles as needed */
 }
