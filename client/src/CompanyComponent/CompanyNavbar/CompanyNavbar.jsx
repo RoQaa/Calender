@@ -116,7 +116,7 @@ export default function CompanyNavbar({ setnewNot, newNot, setUserData, Nots }) 
                             <div className="toast-header">
                               <img src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.553209589.1714694400&semt=ais" className="rounded overflow-hidden col-1 me-2" alt="..." />
                               <strong className="me-auto">Bootstrap</strong>
-                              <small>11 mins ago</small>
+                              <small>{not.timeDiffMessage}</small>
                             </div>
                             <div className="toast-body ms-4 ps-3 text-truncate">
                               {not?.description}

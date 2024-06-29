@@ -21,6 +21,8 @@ function App() {
   const [userInfo, setUserInfo] = useState({});
   const [newNot, setnewNot] = useState(false)
   const [nots, setNots] = useState([]);
+  const [timeDifference, setTimeDifference] = useState({ hours: 0, minutes: 0 });
+
   let userSocketId = null;
 
   const saveData = () => {
@@ -35,7 +37,32 @@ function App() {
 
     try {
       const res = await axios.get(`${process.env.REACT_APP_API}/company/getMyNotes`, { headers });
+      res?.data?.notes?.map((not) => {
+        const timestampStr = not.createdAt;
+        const timestamp = new Date(timestampStr);
+        const currentTime = new Date();
+        const timeDiffInSeconds = (currentTime - timestamp) / 1000;
+        let timeDiffMessage = '';
+        if (timeDiffInSeconds >= 60 * 60 * 24 * 30) {
+          const months = Math.floor(timeDiffInSeconds / (60 * 60 * 24 * 30));
+          timeDiffMessage = `${months} month${months > 1 ? 's' : ''} ago`;
+        } else if (timeDiffInSeconds >= 60 * 60 * 24 * 7) {
+          const weeks = Math.floor(timeDiffInSeconds / (60 * 60 * 24 * 7));
+          timeDiffMessage = `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+        } else if (timeDiffInSeconds >= 60 * 60 * 24) {
+          const days = Math.floor(timeDiffInSeconds / (60 * 60 * 24));
+          timeDiffMessage = `${days} day${days > 1 ? 's' : ''} ago`;
+        } else if (timeDiffInSeconds >= 60 * 60) {
+          const hours = Math.floor(timeDiffInSeconds / (60 * 60));
+          timeDiffMessage = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else {
+          const minutes = Math.floor(timeDiffInSeconds / 60);
+          timeDiffMessage = `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        }
+        not.timeDiffMessage = timeDiffMessage;
+      })
       setNots(res.data.notes);
+      console.log(res.data);
     } catch (err) {
       if (err.response?.status === 401) {
         localStorage.clear();
@@ -43,6 +70,7 @@ function App() {
         toast.error(err.response?.data?.message);
       } else {
         setNots([])
+
         // toast.error(err.response?.data?.message);
       }
     }

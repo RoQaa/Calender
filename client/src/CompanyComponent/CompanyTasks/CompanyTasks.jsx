@@ -407,9 +407,9 @@ export default function ComapnyTasks({ setUserData }) {
         {LoadingTasks ? <div className='col-12 text-center my-5 py-5'>
           <i className='fa fa-spin fa-spinner fa-3x text-success'></i>
         </div> : <>
-          {Tasks?.length != 0 ? <div className='tableCss'>
+          {Tasks?.length != 0 ? <div className='table-responsive'>
 
-            <table class="table table-striped  table-hover mx-auto text-center mb-5 tableCss">
+            <table class="table table-striped  table-hover mx-auto text-center mb-5 ">
               <thead >
                 <tr >
                   <th scope="col" className='mainFont' >#</th>

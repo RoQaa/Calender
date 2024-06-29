@@ -27,7 +27,7 @@ export default function Notifaction({ Nots }) {
                                     </div>
                                     <div className='col-9 col-md-11'>
                                         <p className=''>{not?.description}</p>
-                                        <small>11 mins ago</small>
+                                        <small>{not?.timeDiffMessage}</small>
                                     </div>
                                 </div>
                             </div>
