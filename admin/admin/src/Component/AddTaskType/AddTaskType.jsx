@@ -211,7 +211,7 @@ export default function AddTaskType() {
     <div className='container pt-5'>
       <h2 className='text-center mainFont h1'>Task Types</h2>
       <div className=' p-5'>
-        <button onClick={() => { setCreateMood(true) }} className='btn mainBtn w-100 mb-2'>Add New Company</button>
+        <button onClick={() => { setCreateMood(true) }} className='btn mainBtn w-100 mb-2'>Add New Task Type</button>
 
         {GetLoading ? <div className='col-12 text-center my-5 py-5'>
           <i className='fa fa-spin fa-spinner fa-3x text-success'></i>

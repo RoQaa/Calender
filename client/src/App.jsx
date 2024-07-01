@@ -98,6 +98,8 @@ function App() {
           if (data.note.to === userSocketId) {
             setnewNot(true)
             getUserNot()
+
+
             toast.custom((t) => (
               <div
                 className={`toast ${t.visible ? 'show' : 'hide'} bg-white shadow-lg rounded-lg pointer-events-auto d-flex`}
@@ -170,9 +172,10 @@ function App() {
 
 
   return <>
-    <Toaster toastOptions={{
+     <Toaster toastOptions={{
       duration: 3000
-    }} />
+    }} /> 
+ 
     <RouterProvider router={routes}>
 
     </RouterProvider>
